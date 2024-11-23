@@ -9,7 +9,9 @@ import {
   Tabs,
   Typography,
 } from "antd";
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../services";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -17,18 +19,48 @@ const { TabPane } = Tabs;
 const AuthPage: React.FC = () => {
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
+  const navigate = useNavigate();
 
-  const onLogin = (values: any) => {
-    // Implement user login logic
-    console.log("Đăng nhập người dùng:", values);
-    message.success("Đăng nhập thành công!");
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
+
+  const onLogin = async (values: { email: string; password: string }) => {
+    try {
+      setLoading(true);
+      const response = await authService.login(values.email, values.password);
+
+      if (response.data.success) {
+        message.success("Đăng nhập thành công!");
+
+        // Redirect to home page after successful login
+        navigate("/");
+      } else {
+        message.error(response.data.success);
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.message || "Đăng nhập thất bại");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onRegister = (values: any) => {
-    // Implement user registration logic
-    console.log("Đăng ký người dùng:", values);
-    message.success("Đăng ký thành công!");
-    loginForm.resetFields();
+  const onRegister = async (values: {
+    email: string;
+    password: string;
+    name: string;
+  }) => {
+    try {
+      setLoading(true);
+      await authService.register(values.email, values.password, values.name);
+      message.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      registerForm.resetFields();
+      // Switch to login tab after successful registration
+      setActiveTab("login");
+    } catch (error: any) {
+      message.error(error.response?.data?.message || "Đăng ký thất bại");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +79,7 @@ const AuthPage: React.FC = () => {
         </Title>
 
         <Card bordered={false}>
-          <Tabs centered>
+          <Tabs centered activeKey={activeTab} onChange={setActiveTab}>
             <TabPane tab="Đăng nhập" key="login">
               <Form
                 form={loginForm}
@@ -78,7 +110,12 @@ const AuthPage: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" block>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    loading={loading}
+                  >
                     Đăng nhập
                   </Button>
                 </Form.Item>
@@ -144,7 +181,12 @@ const AuthPage: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" block>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    loading={loading}
+                  >
                     Đăng ký
                   </Button>
                 </Form.Item>
