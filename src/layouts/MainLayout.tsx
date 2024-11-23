@@ -1,102 +1,85 @@
-import React from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Typography } from "antd";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import useStore from "../store/useStore";
+import { useAuthStore } from "../store/useAuthStore";
+import useBreakpoints from "../hooks/useBreakpoints";
+import { getMenuItems } from "./fns";
 
 const { Header, Content } = Layout;
+const { Title } = Typography;
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
-  const user = useStore((state) => state.user);
+  const { isMobile } = useBreakpoints();
+  const { user } = useAuthStore((state) => state);
   const isAuthPage = ["/auth"].includes(location.pathname);
+  const menuItems = useMemo(() => getMenuItems(user), [user]);
 
   if (isAuthPage) {
     return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
+      <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
+        <Content
+          style={{
+            padding: 24,
+            margin: "24px auto",
+            maxWidth: 1200,
+            background: "#fff",
+            borderRadius: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
           {children}
         </Content>
       </Layout>
     );
   }
 
-  // Menu items based on user role
-  const getMenuItems = () => {
-    const menuItems = [
-      {
-        key: "/",
-        label: <Link to="/">Trang chủ</Link>,
-      },
-    ];
-
-    // User menu items
-    if (user?.role === "user") {
-      menuItems.push(
-        {
-          key: "/submit",
-          label: <Link to="/submit">Gửi sáng kiến</Link>,
-        },
-        {
-          key: "/my-initiatives",
-          label: <Link to="/my-initiatives">Sáng kiến của tôi</Link>,
-        }
-      );
-    }
-
-    // Admin menu items
-    if (user?.role === "admin") {
-      menuItems.push(
-        {
-          key: "/initiatives",
-          label: <Link to="/initiatives">Quản lý sáng kiến</Link>,
-        },
-        {
-          key: "/users",
-          label: <Link to="/users">Quản lý người dùng</Link>,
-        }
-      );
-    }
-
-    // Evaluator menu items
-    if (user?.role === "evaluator") {
-      menuItems.push({
-        key: "/evaluate",
-        label: <Link to="/evaluate">Chấm điểm sáng kiến</Link>,
-      });
-    }
-
-    // Admin and Manager menu items
-    if (user?.role === "admin" || user?.role === "manager") {
-      menuItems.push({
-        key: "/reports",
-        label: <Link to="/reports">Báo cáo thống kê</Link>,
-      });
-    }
-
-    // Secretary menu items
-    if (user?.role === "secretary") {
-      menuItems.push({
-        key: "/review",
-        label: <Link to="/review">Kiểm tra hồ sơ</Link>,
-      });
-    }
-
-    return menuItems;
-  };
-
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Header>
-        <div className="logo" />
+    <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
+      <Header
+        style={{
+          background: "#fff",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          padding: "0 24px",
+          display: "flex",
+          alignItems: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          width: "100%",
+        }}
+      >
+        {!isMobile && (
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <div className="logo" style={{ marginRight: 40 }}>
+              <Title level={4} style={{ margin: 0, color: "#1890ff" }}>
+                Sáng Kiến
+              </Title>
+            </div>
+          </Link>
+        )}
         <Menu
-          theme="dark"
-          mode="horizontal"
+          mode={"horizontal"}
           selectedKeys={[location.pathname]}
-          items={getMenuItems()}
+          items={menuItems}
+          style={{
+            flex: 1,
+            borderBottom: "none",
+            backgroundColor: "transparent",
+          }}
         />
       </Header>
-      <Layout style={{ padding: "0 24px 24px" }}>
-        <Content style={{ padding: 24, margin: 0, minHeight: 280 }}>
+      <Layout style={{ padding: "24px", background: "#f5f5f5" }}>
+        <Content
+          style={{
+            padding: 24,
+            margin: 0,
+            minHeight: 280,
+            background: "#fff",
+            borderRadius: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
           {children}
         </Content>
       </Layout>

@@ -1,18 +1,20 @@
-import apiClient from "../lib/apiClient";
+import apiClient from "../utils/apiClient";
 import { Initiative } from "./types";
 
+interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+interface InitiativeResponse {
+  items: Initiative[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export const initiativeService = {
-  async getAll() {
-    return apiClient.get<Initiative[]>("/initiatives");
-  },
-
-  async getById(id: string) {
-    return apiClient.get<Initiative>(`/initiatives/${id}`);
-  },
-
-  async create(
-    data: Omit<Initiative, "id" | "userId" | "createdAt" | "updatedAt">
-  ) {
+  async create(data: Initiative) {
     return apiClient.post<Initiative>("/initiatives", data);
   },
 
@@ -20,7 +22,33 @@ export const initiativeService = {
     return apiClient.put<Initiative>(`/initiatives/${id}`, data);
   },
 
-  async delete(id: string) {
-    return apiClient.delete(`/initiatives/${id}`);
+  getMyInitiatives: async (
+    params: PaginationParams = { page: 1, limit: 10 }
+  ): Promise<InitiativeResponse> => {
+    try {
+      const queryParams = new URLSearchParams({
+        page: params.page.toString(),
+        limit: params.limit.toString(),
+      });
+
+      const { data } = await apiClient.get<InitiativeResponse>(
+        `/initiatives?${queryParams.toString()}`
+      );
+
+      return {
+        items: data.items || [],
+        total: data.total || 0,
+        page: data.page || 1,
+        limit: data.limit || 10,
+      };
+    } catch (error) {
+      console.error("Error fetching initiatives:", error);
+      return {
+        items: [],
+        total: 0,
+        page: params.page,
+        limit: params.limit,
+      };
+    }
   },
 };

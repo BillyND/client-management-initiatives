@@ -1,29 +1,20 @@
-import React from "react";
-import { Typography, Button, Space } from "antd";
-import { Link } from "react-router-dom";
-
-const { Title } = Typography;
+import React, { useEffect } from "react";
+import { useAuthStore } from "../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <Title>Hệ thống quản lý và chấm sáng kiến trực tuyến</Title>
-      <Space direction="vertical" size="large" style={{ marginTop: "20px" }}>
-        <Button type="primary">
-          <Link to="/submit">Gửi sáng kiến</Link>
-        </Button>
-        <Button>
-          <Link to="/initiatives">Xem danh sách sáng kiến</Link>
-        </Button>
-        <Button>
-          <Link to="/evaluate">Chấm điểm sáng kiến</Link>
-        </Button>
-        <Button>
-          <Link to="/reports">Xem báo cáo</Link>
-        </Button>
-      </Space>
-    </div>
-  );
+  const user = useAuthStore(({ user }) => user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role === "user") {
+      navigate("/my-initiatives");
+    }
+  }, [user, navigate]);
+
+  console.log("===>user", user);
+
+  return <div style={{ textAlign: "center", marginTop: "50px" }}>Home</div>;
 };
 
 export default HomePage;

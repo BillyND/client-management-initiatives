@@ -10,21 +10,25 @@ export interface ApiResponse<T> {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
   accessToken?: string;
   refreshToken?: string;
+  role: string;
 }
 
 export interface Initiative {
-  id: string;
-  title: string;
-  description: string;
-  status: "draft" | "submitted" | "approved" | "rejected";
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
+  name: string;
+  unit: string;
+  position: string;
+  email: string;
+  initiativeName: string;
+  problem: string;
+  goal: string;
+  method: string;
+  expectedResult: string;
+  attachment?: string;
 }
 
 export interface Evaluation {

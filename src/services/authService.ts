@@ -1,20 +1,39 @@
-import apiClient from "../lib/apiClient";
-import { User } from "./types";
+import apiClient from "../utils/apiClient";
+import { useAuthStore } from "../store/useAuthStore";
 
 export const authService = {
   async login(email: string, password: string) {
-    return apiClient.post("/auth/login", { email, password });
+    const response = await apiClient.post(
+      "/auth/login",
+      { email, password },
+      { withCredentials: true }
+    );
+
+    useAuthStore.getState().setAuth(response.data.user, {
+      refresh: response?.data?.refreshToken,
+      access: response?.data?.accessToken,
+    });
+
+    return response.data;
   },
 
   async register(email: string, password: string, name: string) {
-    return apiClient.post<User>("/auth/register", { email, password, name });
+    const response = await apiClient.post("/auth/register", {
+      email,
+      password,
+      name,
+    });
+
+    return response.data;
   },
 
   async logout() {
-    return apiClient.post("/auth/logout");
+    await apiClient.post("/auth/logout", {}, { withCredentials: true });
+    useAuthStore.getState().logout();
   },
 
-  async getCurrentUser() {
-    return apiClient.get<User>("/auth/me");
+  async verifyToken() {
+    const response = await apiClient.get("/auth/verify-token");
+    return response.data;
   },
 };

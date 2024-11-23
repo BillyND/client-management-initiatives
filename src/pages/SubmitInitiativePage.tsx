@@ -1,46 +1,17 @@
+import { Button, Form, Input, message, Typography } from "antd";
 import React from "react";
-import { Typography, Form, Input, Button, message, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import useStore from "../store/useStore";
+import { Initiative, initiativeService } from "../services";
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
 const SubmitInitiativePage: React.FC = () => {
   const [form] = Form.useForm();
-  const addInitiative = useStore((state) => state.addInitiative);
 
-  const onFinish = (values: {
-    name: string;
-    unit: string;
-    position: string;
-    email: string;
-    initiativeName: string;
-    problem: string;
-    goal: string;
-    method: string;
-    expectedResult: string;
-  }) => {
-    const id = Date.now().toString(); // Simple ID generation
-    addInitiative({
-      ...values,
-      id,
-      status: "pending",
-    });
+  const onFinish = async (values: Initiative) => {
+    await initiativeService.create(values);
     message.success("Sáng kiến đã được gửi thành công!");
-    form.resetFields();
-  };
-
-  const uploadProps = {
-    name: "file",
-    action: "/api/upload", // Replace with actual upload endpoint
-    onChange(info: any) {
-      if (info.file.status === "done") {
-        message.success(`${info.file.name} đã được tải lên thành công`);
-      } else if (info.file.status === "error") {
-        message.error(`${info.file.name} tải lên thất bại.`);
-      }
-    },
+    // form.resetFields();
   };
 
   return (
@@ -48,23 +19,10 @@ const SubmitInitiativePage: React.FC = () => {
       <Title level={2}>Gửi sáng kiến</Title>
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Title level={4}>Thông tin cá nhân</Title>
-        <Form.Item name="name" label="Họ và tên" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
         <Form.Item name="unit" label="Đơn vị" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item name="position" label="Chức vụ" rules={[{ required: true }]}>
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label="Email"
-          rules={[
-            { required: true },
-            { type: "email", message: "Email không hợp lệ!" },
-          ]}
-        >
           <Input />
         </Form.Item>
 
@@ -102,10 +60,17 @@ const SubmitInitiativePage: React.FC = () => {
         </Form.Item>
 
         <Title level={4}>Tài liệu kèm theo</Title>
-        <Form.Item name="attachments" label="Tải lên tài liệu minh họa">
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />}>Chọn file</Button>
-          </Upload>
+        <Form.Item
+          name="attachment"
+          label="Link tài liệu minh họa"
+          rules={[
+            {
+              type: "url",
+              message: "Vui lòng nhập đúng định dạng URL",
+            },
+          ]}
+        >
+          <Input placeholder="Nhập link tài liệu (vd: https://...)" />
         </Form.Item>
 
         <Form.Item>

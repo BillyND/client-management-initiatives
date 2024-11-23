@@ -1,4 +1,4 @@
-import apiClient from "../lib/apiClient";
+import apiClient from "../utils/apiClient";
 import { Report } from "./types";
 
 export const reportService = {
