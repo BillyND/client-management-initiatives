@@ -1,8 +1,8 @@
 import { message } from "antd";
-import { useCallback, useEffect, useState } from "react";
 import type { TablePaginationConfig } from "antd/es/table";
-import apiClient from "../utils/apiClient";
+import { useCallback, useEffect, useState } from "react";
 import { ITEM_LIST_LIMITATION } from "../constants";
+import apiClient from "../utils/apiClient";
 
 export interface WithDataSourceProps {
   sort?: string[];
@@ -158,8 +158,11 @@ export default function withDataSource(
         setLoading(false);
         setFirstLoad(false);
       } else {
-        // Handle API call
-        abortRequest(dataSource);
+        // Clear previous timer if exists
+        if (timers[dataSource]) {
+          clearTimeout(timers[dataSource]);
+          delete timers[dataSource];
+        }
 
         timers[dataSource] = setTimeout(async () => {
           const { queryValue, ...otherFilters } = filterValues;
@@ -227,9 +230,12 @@ export default function withDataSource(
             setPagination((prev) => ({ ...prev, total: data.total }));
             setFirstLoad(false);
           } catch (error: any) {
-            if (error.name !== "AbortError") {
-              message.error("Không thể tải dữ liệu");
-              console.error("Error fetching data:", error);
+            const isNetworkError =
+              error.name !== "AbortError" && error.name !== "CanceledError";
+
+            if (isNetworkError) {
+              console.error("[Data Fetch Error]:", error);
+              message.error("Không thể tải dữ liệu. Vui lòng thử lại sau.");
             }
           } finally {
             setLoading(false);
@@ -250,8 +256,6 @@ export default function withDataSource(
 
     useEffect(() => {
       fetchData();
-
-      return () => abortRequest(dataSource);
     }, [dataSource, fetchData]);
 
     return (
@@ -272,16 +276,4 @@ export default function withDataSource(
       />
     );
   };
-}
-
-function abortRequest(dataSource: string) {
-  if (aborters[dataSource]) {
-    aborters[dataSource].abort();
-    delete aborters[dataSource];
-  }
-
-  if (timers[dataSource]) {
-    clearTimeout(timers[dataSource]);
-    delete timers[dataSource];
-  }
 }
