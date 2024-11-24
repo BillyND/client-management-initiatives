@@ -64,7 +64,16 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <Row justify="center" align="middle">
+    <Row
+      justify="center"
+      align="middle"
+      style={{
+        minHeight: "100vh",
+        paddingBottom: 24,
+        background:
+          "linear-gradient(135deg, #E6D5FF 0%, #FFE5F0 20%, #E8F4FA 40%, #E8FFE9 60%, #FFF5CC 80%, #FFE5E5 100%)",
+      }}
+    >
       <Col xs={22} sm={16} md={12} lg={8} xl={6}>
         <Title
           level={2}
