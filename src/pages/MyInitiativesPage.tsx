@@ -1,8 +1,8 @@
-import React from "react";
+import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Grid, Space, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import React from "react";
 import DataSourceListTable from "../components/ListTable";
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 
 const { useBreakpoint } = Grid;
 
@@ -119,22 +119,20 @@ const MyInitiativesPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: screens.xs ? "12px" : "24px" }}>
-      <DataSourceListTable
-        title="Sáng kiến của tôi"
-        dataSource="initiatives"
-        columns={columns}
-        filters={filters}
-        queryKey="initiativeName"
-        onViewDetail={handleViewDetail}
-        onEdit={handleEdit}
-        pagination={{
-          showSizeChanger: !screens.xs,
-          size: screens.xs ? "small" : "default",
-          showTotal: (total: number) => `Tổng số ${total} sáng kiến`,
-        }}
-      />
-    </div>
+    <DataSourceListTable
+      title="Sáng kiến của tôi"
+      dataSource="initiatives"
+      columns={columns}
+      filters={filters}
+      queryKey="initiativeName"
+      onViewDetail={handleViewDetail}
+      onEdit={handleEdit}
+      pagination={{
+        showSizeChanger: !screens.xs,
+        size: screens.xs ? "small" : "default",
+        showTotal: (total: number) => `Tổng số ${total} sáng kiến`,
+      }}
+    />
   );
 };
 
