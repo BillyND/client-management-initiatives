@@ -1,8 +1,8 @@
 import { message } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import type { TablePaginationConfig } from "antd/es/table";
-import { useAuthStore } from "../store/useAuthStore";
 import apiClient from "../utils/apiClient";
+import { ITEM_LIST_LIMITATION } from "../constants";
 
 export interface WithDataSourceProps {
   sort?: string[];
@@ -42,6 +42,7 @@ export default function withDataSource(
       sort: _sort,
       dataSource = "",
       onlyLocalData = false,
+      abbreviated = false,
       ...otherProps
     } = props;
 
@@ -56,19 +57,20 @@ export default function withDataSource(
       current: 1,
       pageSize: 10,
       total: 0,
-      showSizeChanger: true,
-      showTotal: (total) => `Tổng số ${total} mục`,
     });
+
+    const page = pagination.current || 1;
+    const limit = pagination.pageSize || 10;
 
     const fetchData = useCallback(async () => {
       setLoading(true);
 
       if (onlyLocalData) {
-        // Xử lý dữ liệu local
+        // Handle local data filtering
         const { queryValue, ...otherFilters } = filterValues;
         let filteredItems = otherProps.items || [];
 
-        // Áp dụng filter tìm kiếm
+        // Apply query filter
         if (queryValue) {
           filteredItems = filteredItems.filter((item: any) =>
             item[queryKey]
@@ -78,20 +80,29 @@ export default function withDataSource(
           );
         }
 
-        // Áp dụng các filter khác
-        Object.entries(otherFilters).forEach(([key, value]) => {
-          if (Array.isArray(value) && value.length) {
+        // Apply other filters
+        for (const filterOnKey in otherFilters) {
+          if (
+            otherFilters[filterOnKey] instanceof Array &&
+            otherFilters[filterOnKey]?.length
+          ) {
             filteredItems = filteredItems.filter((item: any) =>
-              value.includes(item[key])
+              otherFilters[filterOnKey].includes(item[filterOnKey])
             );
-          } else if (typeof value === "string" && value) {
+          } else if (
+            typeof otherFilters[filterOnKey] === "string" &&
+            otherFilters[filterOnKey]
+          ) {
             filteredItems = filteredItems.filter((item: any) =>
-              item[key]?.toString().toLowerCase().includes(value.toLowerCase())
+              item[filterOnKey]
+                ?.toString()
+                .toLowerCase()
+                .includes(otherFilters[filterOnKey].toLowerCase())
             );
           }
-        });
+        }
 
-        // Sắp xếp
+        // Sort
         if (sort?.[0]) {
           const [field, order] = sort[0].split(" ");
           filteredItems.sort((a: any, b: any) => {
@@ -101,19 +112,45 @@ export default function withDataSource(
               field === "createdAt" ? new Date(b[field]).getTime() : b[field];
 
             if (typeof aVal === "string") {
-              return order === "ascend"
+              return order === "asc"
                 ? aVal.localeCompare(bVal)
                 : bVal.localeCompare(aVal);
             }
-            return order === "ascend" ? aVal - bVal : bVal - aVal;
+            return order === "asc" ? aVal - bVal : bVal - aVal;
           });
         }
 
-        // Phân trang
-        const start = (pagination.current! - 1) * pagination.pageSize!;
+        // Sort items
+        if (sort?.[0]) {
+          const [key, order] = sort[0].split(" ");
+          const isAsc = order === "asc";
+
+          filteredItems = filteredItems.sort((a: any, b: any) => {
+            const aValue =
+              key === "createdAt" ? new Date(a[key]).getTime() : a[key];
+            const bValue =
+              key === "createdAt" ? new Date(b[key]).getTime() : b[key];
+
+            // Prevent bug: Ensure values are comparable
+            if (aValue === undefined || bValue === undefined) {
+              return 0;
+            }
+
+            if (typeof aValue === "string" && typeof bValue === "string") {
+              return isAsc
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+            }
+
+            return isAsc ? aValue - bValue : bValue - aValue;
+          });
+        }
+
+        // Paginate items
+        const startIndex = (page - 1) * limit;
         const paginatedItems = filteredItems.slice(
-          start,
-          start + pagination.pageSize!
+          startIndex,
+          startIndex + limit
         );
 
         setItems(paginatedItems);
@@ -121,56 +158,71 @@ export default function withDataSource(
         setLoading(false);
         setFirstLoad(false);
       } else {
-        // Xử lý API call
+        // Handle API call
         abortRequest(dataSource);
 
         timers[dataSource] = setTimeout(async () => {
           const { queryValue, ...otherFilters } = filterValues;
 
-          // Tạo params
-          const params = new URLSearchParams();
-          params.append("page", pagination.current!.toString());
-          params.append("limit", pagination.pageSize!.toString());
+          // Generate search params
+          const searchParams = [`limit=${limit || ITEM_LIST_LIMITATION}`];
 
-          if (queryValue) {
-            params.append("q", queryValue);
+          if (abbreviated) {
+            searchParams.push(`abbreviated=${abbreviated}`);
+          }
+
+          if (page > 1) {
+            searchParams.push(`page=${page}`);
           }
 
           if (sort?.length) {
-            params.append("sort", sort[0]);
+            searchParams.push(`sort=${sort[0].toString().replace(" ", "|")}`);
           }
 
-          // Thêm các filter khác
-          Object.entries(otherFilters).forEach(([key, value]) => {
-            if (value) {
-              params.append(
-                key,
-                Array.isArray(value) ? value.join(",") : value
+          if (queryValue) {
+            searchParams.push(
+              `filter=${queryKey}|${encodeURIComponent(queryValue?.trim())}`
+            );
+          }
+
+          for (const filterOnKey in otherFilters) {
+            if (
+              otherFilters[filterOnKey] instanceof Array &&
+              otherFilters[filterOnKey]?.length
+            ) {
+              searchParams.push(
+                `filter=${filterOnKey}|${otherFilters[filterOnKey].join(",")}`
+              );
+            } else if (
+              typeof otherFilters[filterOnKey] === "string" &&
+              otherFilters[filterOnKey]
+            ) {
+              searchParams.push(
+                `filter=${filterOnKey}|${otherFilters[filterOnKey]}`
               );
             }
-          });
+          }
 
           try {
+            // Request data
+            const queryString = searchParams.join("&");
             aborters[dataSource] = new AbortController();
-            const response = await apiClient.get(
-              `${
-                import.meta.env.VITE_API_URL
-              }/${dataSource}?${params.toString()}`,
+            const queryDelimiter = dataSource.includes("?") ? "&" : "?";
+
+            const res = await apiClient.get(
+              `${dataSource}${
+                queryString ? `${queryDelimiter}${queryString}` : ""
+              }`,
               {
-                headers: {
-                  Authorization: `Bearer ${
-                    useAuthStore.getState().accessToken
-                  }`,
-                },
                 signal: aborters[dataSource].signal,
               }
             );
 
-            if (response.status !== 200) {
+            if (res.status !== 200) {
               throw new Error("Failed to fetch data");
             }
 
-            const data = response.data;
+            const data = res.data;
             setItems(data.items);
             setPagination((prev) => ({ ...prev, total: data.total }));
             setFirstLoad(false);
@@ -189,16 +241,18 @@ export default function withDataSource(
       filterValues,
       otherProps.items,
       sort,
-      pagination,
+      page,
+      limit,
       queryKey,
       dataSource,
+      abbreviated,
     ]);
 
     useEffect(() => {
       fetchData();
+
       return () => abortRequest(dataSource);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataSource]);
+    }, [dataSource, fetchData]);
 
     return (
       <Component
@@ -225,6 +279,7 @@ function abortRequest(dataSource: string) {
     aborters[dataSource].abort();
     delete aborters[dataSource];
   }
+
   if (timers[dataSource]) {
     clearTimeout(timers[dataSource]);
     delete timers[dataSource];

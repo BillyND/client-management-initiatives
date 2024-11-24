@@ -1,12 +1,13 @@
 import React from "react";
 import { Button, Grid, Space, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import ListTable from "../components/ListTable";
+import DataSourceListTable from "../components/ListTable";
+import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 
 const { useBreakpoint } = Grid;
 
 interface Initiative {
-  id: string;
+  _id: string;
   title: string;
   submissionDate: string;
   status: "pending" | "approved" | "rejected";
@@ -78,20 +79,19 @@ const MyInitiativesPage: React.FC = () => {
       render: (_, record) => (
         <Space size="small" direction={screens.xs ? "vertical" : "horizontal"}>
           <Button
-            type="link"
+            type="primary"
+            ghost
             size="small"
-            onClick={() => handleViewDetail(record.id)}
-          >
-            Xem chi tiết
-          </Button>
+            onClick={() => handleViewDetail(record._id)}
+            icon={<EyeOutlined />}
+          ></Button>
           {record.status === "pending" && (
             <Button
-              type="link"
+              type="default"
               size="small"
-              onClick={() => handleEdit(record.id)}
-            >
-              Chỉnh sửa
-            </Button>
+              onClick={() => handleEdit(record._id)}
+              icon={<EditOutlined />}
+            ></Button>
           )}
         </Space>
       ),
@@ -120,7 +120,7 @@ const MyInitiativesPage: React.FC = () => {
 
   return (
     <div style={{ padding: screens.xs ? "12px" : "24px" }}>
-      <ListTable
+      <DataSourceListTable
         title="Sáng kiến của tôi"
         dataSource="initiatives"
         columns={columns}

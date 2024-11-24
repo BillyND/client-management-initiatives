@@ -2,6 +2,7 @@ import { FilterOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
+  Checkbox,
   Dropdown,
   Input,
   Popover,
@@ -13,11 +14,12 @@ import {
   Typography,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import type { WithDataSourceChildProps } from "../hoc/withDataSource";
 import withDataSource from "../hoc/withDataSource";
 
 export interface ListTableProps extends WithDataSourceChildProps {
+  title?: string;
   columns: ColumnsType<any>;
   filters?: {
     key: string;
@@ -28,7 +30,6 @@ export interface ListTableProps extends WithDataSourceChildProps {
   onEdit?: (record: any) => void;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 const ListTable: React.FC<ListTableProps> = ({
   items,
   loading,
@@ -40,36 +41,16 @@ const ListTable: React.FC<ListTableProps> = ({
   setFilterValues,
   sort,
   setSort,
-  onViewDetail,
-  onEdit,
   title,
-  selectedFilters,
 }) => {
   const [searchText, setSearchText] = useState("");
   const [activeFilters, setActiveFilters] = useState<{ [key: string]: string }>(
     {}
   );
+
   const [selectedSortField, setSelectedSortField] = useState<string | null>(
     null
   );
-
-  // Khởi tạo giá trị filter từ prop
-  useEffect(() => {
-    if (selectedFilters) {
-      setFilterValues({ ...filterValues, ...selectedFilters });
-      setActiveFilters(
-        Object.entries(selectedFilters).reduce((acc, [key, value]) => {
-          const filter = filters?.find((f) => f.key === key);
-          const option = filter?.options.find((opt) => opt.value === value);
-          if (option) {
-            acc[key] = option.label;
-          }
-          return acc;
-        }, {} as { [key: string]: string })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterValues]);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -77,7 +58,7 @@ const ListTable: React.FC<ListTableProps> = ({
     setPagination({ ...pagination, current: 1 });
   };
 
-  const handleTableChange = (newPagination: any, filters: any, sorter: any) => {
+  const handleTableChange = (newPagination: any, _: any, sorter: any) => {
     setPagination(newPagination);
 
     if (sorter.field && sorter.order) {
@@ -116,42 +97,70 @@ const ListTable: React.FC<ListTableProps> = ({
   };
 
   const SortPopoverContent = () => (
-    <div style={{ padding: "8px", minWidth: "200px" }}>
+    <div style={{ minWidth: "200px" }}>
       {columns
-        .filter((col) => col.sorter)
-        .map((col: any = {}) => (
-          <div key={col?.key} style={{ marginBottom: "8px" }}>
-            <Typography.Text strong>Sắp xếp theo {col?.title}:</Typography.Text>
-            <Radio.Group
-              onChange={(e) => {
-                setSort([`${col.key} ${e.target.value}`]);
-                setSelectedSortField(col.key as string);
+        .filter((col) => col?.sorter)
+        .map((col) => {
+          const { key, title } = col;
+          return (
+            <div
+              key={key}
+              style={{
+                padding: "8px",
+                borderBottom: "1px solid #f0f0f0",
               }}
-              value={
-                sort?.[0]?.includes(col.key as string)
-                  ? sort[0].split(" ")[1]
-                  : undefined
-              }
-              style={{ marginTop: "4px" }}
             >
-              <Space direction="vertical">
-                <Radio value="ascend">Tăng dần</Radio>
-                <Radio value="descend">Giảm dần</Radio>
-              </Space>
-            </Radio.Group>
-          </div>
-        ))}
+              <Checkbox.Group
+                onChange={(checkedValue) => {
+                  if (checkedValue.includes(key as string)) {
+                    setSelectedSortField(key as string);
+                    setSort([`${key} ${sort?.[0]?.split(" ")[1]}`]);
+                  } else {
+                    setSelectedSortField(null);
+                    setSort([]);
+                  }
+                }}
+                value={selectedSortField === key ? [key] : []}
+                style={{ fontSize: "14px", color: "#262626" }}
+              >
+                <Checkbox value={key}>{title as string}</Checkbox>
+              </Checkbox.Group>
+            </div>
+          );
+        })}
+
+      <div style={{ padding: "8px", borderTop: "1px solid #f0f0f0" }}>
+        <Typography.Text
+          strong
+          style={{ display: "block", marginBottom: "8px" }}
+        >
+          Thứ tự sắp xếp:
+        </Typography.Text>
+        <Radio.Group
+          onChange={(e) => {
+            if (selectedSortField) {
+              setSort([`${selectedSortField} ${e.target.value}`]);
+            }
+          }}
+          value={sort?.[0]?.split(" ")[1]}
+          disabled={!selectedSortField}
+        >
+          <Space direction="vertical" size="middle">
+            <Radio value="asc" style={{ fontSize: "14px" }}>
+              <span style={{ color: "#595959" }}>Tăng dần</span>
+            </Radio>
+            <Radio value="desc" style={{ fontSize: "14px" }}>
+              <span style={{ color: "#595959" }}>Giảm dần</span>
+            </Radio>
+          </Space>
+        </Radio.Group>
+      </div>
     </div>
   );
 
   const renderActiveFilters = () => {
     return Object.entries(activeFilters).map(([key, value]) => (
-      <Tag
-        key={key}
-        closable
-        onClose={() => handleClearFilter(key)}
-        style={{ marginRight: 8, marginBottom: 8 }}
-      >
+      <Tag key={key} closable onClose={() => handleClearFilter(key)}>
         {filters?.find((f) => f.key === key)?.label}: {value}
       </Tag>
     ));
@@ -241,7 +250,7 @@ const ListTable: React.FC<ListTableProps> = ({
             ...pagination,
             showTotal: (total) => `Tổng số ${total} bản ghi`,
             showSizeChanger: true,
-            showQuickJumper: true,
+            showQuickJumper: false,
           }}
           onChange={handleTableChange}
           rowKey={(record) => record.id || record._id}
@@ -252,4 +261,8 @@ const ListTable: React.FC<ListTableProps> = ({
   );
 };
 
-export default withDataSource(ListTable);
+const DataSourceListTable = withDataSource(
+  ListTable as React.ComponentType<WithDataSourceChildProps>
+);
+
+export default DataSourceListTable;
