@@ -3,7 +3,7 @@ import { create } from "zustand";
 interface Initiative {
   id: string;
   name: string;
-  unit: string;
+  department: string;
   position: string;
   email: string;
   initiativeName: string;
@@ -45,7 +45,7 @@ const useStore = create<StoreState>((set) => ({
       id: "1",
       name: "Nguyễn Văn A",
       email: "nguyenvana@school.edu.vn",
-      unit: "Khoa Toán",
+      department: "Khoa Toán",
       position: "Giáo viên",
       initiativeName: "Phương pháp giảng dạy toán học tương tác",
       problem: "Học sinh thiếu hứng thú với môn toán",
@@ -58,7 +58,7 @@ const useStore = create<StoreState>((set) => ({
       id: "2",
       name: "Trần Thị B",
       email: "tranthib@school.edu.vn",
-      unit: "Khoa Văn",
+      department: "Khoa Văn",
       position: "Trưởng khoa",
       initiativeName: "Câu lạc bộ văn học sáng tạo",
       problem: "Thiếu không gian cho học sinh phát triển năng khiếu văn học",

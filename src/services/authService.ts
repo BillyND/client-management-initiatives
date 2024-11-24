@@ -1,5 +1,6 @@
-import apiClient from "../utils/apiClient";
 import { useAuthStore } from "../store/useAuthStore";
+import apiClient from "../utils/apiClient";
+import { EditProfileFormData, User } from "./types";
 
 export const authService = {
   async login(email: string, password: string) {
@@ -28,12 +29,27 @@ export const authService = {
   },
 
   async logout() {
-    await apiClient.post("/auth/logout", {}, { withCredentials: true });
+    await apiClient
+      .post("/auth/logout", {}, { withCredentials: true })
+      .catch(console.error);
     useAuthStore.getState().logout();
   },
 
   async verifyToken() {
     const response = await apiClient.get("/auth/verify-token");
+    return response.data;
+  },
+
+  changePassword: async (payload: {
+    currentPassword: string;
+    newPassword: string;
+  }) => {
+    const response = await apiClient.post("/auth/change-password", payload);
+    return response.data;
+  },
+
+  async updateProfile(data: EditProfileFormData): Promise<{ user: User }> {
+    const response = await apiClient.put("/auth/profile", data);
     return response.data;
   },
 };

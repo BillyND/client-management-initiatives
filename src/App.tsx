@@ -13,6 +13,8 @@ import SubmitInitiativePage from "./pages/SubmitInitiativePage";
 import { authService } from "./services";
 import { useAuthStore } from "./store/useAuthStore";
 import MyInitiativesPage from "./pages/MyInitiativesPage";
+import ChangePassword from "./pages/ChangePassword";
+import ProfilePage from "./pages/ProfilePage";
 
 const App: React.FC = () => {
   return (
@@ -33,6 +35,8 @@ const App: React.FC = () => {
             <Route path="/evaluate" element={<EvaluationPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Routes>
         </MainLayout>
       </AuthWrapper>

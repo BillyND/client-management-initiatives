@@ -6,3 +6,7 @@ body {
 .ant-menu-root {
   height: 100%;
 }
+
+.prevent-copy {
+  user-select: none;
+}

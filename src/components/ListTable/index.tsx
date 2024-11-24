@@ -1,22 +1,26 @@
 import { FilterOutlined, SortAscendingOutlined } from "@ant-design/icons";
 import {
   Button,
-  Card,
   Checkbox,
   Dropdown,
+  Flex,
   Input,
+  Pagination,
   Popover,
   Radio,
   Space,
-  Table,
   Tag,
   Tooltip,
   Typography,
 } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import React, { useState } from "react";
-import type { WithDataSourceChildProps } from "../hoc/withDataSource";
-import withDataSource from "../hoc/withDataSource";
+import { ColumnsType } from "antd/es/table";
+import { useState } from "react";
+import withDataSource, {
+  WithDataSourceChildProps,
+} from "../../hoc/withDataSource";
+import useBreakpoints from "../../hooks/useBreakpoints";
+import { DesktopTable } from "./DesktopTable";
+import { MobileTable } from "./MobileTable";
 
 export interface ListTableProps extends WithDataSourceChildProps {
   title?: string;
@@ -28,6 +32,12 @@ export interface ListTableProps extends WithDataSourceChildProps {
   }[];
   onViewDetail?: (record: any) => void;
   onEdit?: (record: any) => void;
+}
+
+export interface SharedTableProps {
+  items: any[];
+  loading: boolean;
+  columns: ColumnsType<any>;
 }
 
 const ListTable: React.FC<ListTableProps> = ({
@@ -43,11 +53,11 @@ const ListTable: React.FC<ListTableProps> = ({
   setSort,
   title,
 }) => {
+  // Shared states
   const [searchText, setSearchText] = useState("");
   const [activeFilters, setActiveFilters] = useState<{ [key: string]: string }>(
     {}
   );
-
   const [selectedSortField, setSelectedSortField] = useState<string | null>(
     null
   );
@@ -74,15 +84,8 @@ const ListTable: React.FC<ListTableProps> = ({
     filterKey: string,
     option: { label: string; value: any }
   ) => {
-    const newFilterValues = {
-      ...filterValues,
-      [filterKey]: option.value,
-    };
-    setFilterValues(newFilterValues);
-    setActiveFilters({
-      ...activeFilters,
-      [filterKey]: option.label,
-    });
+    setFilterValues({ ...filterValues, [filterKey]: option.value });
+    setActiveFilters({ ...activeFilters, [filterKey]: option.label });
     setPagination({ ...pagination, current: 1 });
   };
 
@@ -96,12 +99,20 @@ const ListTable: React.FC<ListTableProps> = ({
     setActiveFilters(newActiveFilters);
   };
 
+  const renderActiveFilters = () => {
+    return Object.entries(activeFilters).map(([key, value]) => (
+      <Tag key={key} closable onClose={() => handleClearFilter(key)}>
+        {filters?.find((f) => f.key === key)?.label}: {value}
+      </Tag>
+    ));
+  };
+
   const SortPopoverContent = () => (
     <div style={{ minWidth: "200px" }}>
       {columns
         .filter((col) => col?.sorter)
         .map((col) => {
-          const { key, title } = col;
+          const { key, title } = col || {};
           return (
             <div
               key={key}
@@ -114,7 +125,7 @@ const ListTable: React.FC<ListTableProps> = ({
                 onChange={(checkedValue) => {
                   if (checkedValue.includes(key as string)) {
                     setSelectedSortField(key as string);
-                    setSort([`${key} ${sort?.[0]?.split(" ")[1]}`]);
+                    setSort([`${key} ${sort?.[0]?.split(" ")[1] || "asc"}`]);
                   } else {
                     setSelectedSortField(null);
                     setSort([]);
@@ -158,106 +169,109 @@ const ListTable: React.FC<ListTableProps> = ({
     </div>
   );
 
-  const renderActiveFilters = () => {
-    return Object.entries(activeFilters).map(([key, value]) => (
-      <Tag key={key} closable onClose={() => handleClearFilter(key)}>
-        {filters?.find((f) => f.key === key)?.label}: {value}
-      </Tag>
-    ));
+  const sharedProps: SharedTableProps = {
+    items,
+    loading,
+    columns,
+  };
+
+  const { isMobile } = useBreakpoints();
+
+  const renderTable = () => {
+    if (isMobile) {
+      return <MobileTable {...sharedProps} />;
+    }
+    return <DesktopTable {...sharedProps} />;
   };
 
   return (
-    <Card>
-      {title && (
-        <Typography.Title level={4} style={{ marginBottom: 16 }}>
-          {title}
-        </Typography.Title>
+    <Space direction="vertical" style={{ width: "100%" }}>
+      {title && <Typography.Title level={4}>{title}</Typography.Title>}
+      <Space wrap>
+        <Input.Search
+          placeholder="Tìm kiếm..."
+          allowClear
+          onSearch={handleSearch}
+          style={{ width: 200 }}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+
+        <Tooltip
+          title={
+            selectedSortField
+              ? `Đang sắp xếp theo: ${
+                  columns.find((col) => col.key === selectedSortField)?.title
+                }`
+              : "Sắp xếp"
+          }
+        >
+          <Popover
+            content={<SortPopoverContent />}
+            title="Sắp xếp"
+            trigger="click"
+            placement="bottomLeft"
+          >
+            <Button
+              icon={<SortAscendingOutlined />}
+              type={selectedSortField ? "primary" : "default"}
+            >
+              Sắp xếp
+            </Button>
+          </Popover>
+        </Tooltip>
+
+        {filters && (
+          <Dropdown
+            menu={{
+              items: filters.map((filter) => ({
+                key: filter.key,
+                label: filter.label,
+                children: filter.options.map((opt) => ({
+                  key: `${filter.key}-${opt.value}`,
+                  label: opt.label,
+                  onClick: () => handleFilterClick(filter.key, opt),
+                })),
+              })),
+            }}
+          >
+            <Button
+              icon={<FilterOutlined />}
+              type={
+                Object.keys(activeFilters).length > 0 ? "primary" : "default"
+              }
+            >
+              Lọc
+            </Button>
+          </Dropdown>
+        )}
+      </Space>
+
+      {Object.keys(activeFilters).length > 0 && (
+        <Space wrap style={{ marginBottom: 16 }}>
+          <Typography.Text strong>Bộ lọc đang áp dụng:</Typography.Text>
+          {renderActiveFilters()}
+        </Space>
       )}
 
-      <Space direction="vertical" style={{ width: "100%" }}>
-        <Space style={{ marginBottom: 16 }} wrap>
-          <Input.Search
-            placeholder="Tìm kiếm..."
-            allowClear
-            onSearch={handleSearch}
-            style={{ width: 200 }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+      {renderTable()}
 
-          <Tooltip
-            title={
-              selectedSortField
-                ? `Đang sắp xếp theo: ${
-                    columns.find((col) => col.key === selectedSortField)?.title
-                  }`
-                : "Sắp xếp"
-            }
-          >
-            <Popover
-              content={<SortPopoverContent />}
-              title="Sắp xếp"
-              trigger="click"
-              placement="bottomLeft"
-            >
-              <Button
-                icon={<SortAscendingOutlined />}
-                type={selectedSortField ? "primary" : "default"}
-              >
-                Sắp xếp
-              </Button>
-            </Popover>
-          </Tooltip>
-
-          {filters && (
-            <Dropdown
-              menu={{
-                items: filters.map((filter) => ({
-                  key: filter.key,
-                  label: filter.label,
-                  children: filter.options.map((opt) => ({
-                    key: `${filter.key}-${opt.value}`,
-                    label: opt.label,
-                    onClick: () => handleFilterClick(filter.key, opt),
-                  })),
-                })),
-              }}
-            >
-              <Button
-                icon={<FilterOutlined />}
-                type={
-                  Object.keys(activeFilters).length > 0 ? "primary" : "default"
-                }
-              >
-                Lọc
-              </Button>
-            </Dropdown>
-          )}
-        </Space>
-
-        {Object.keys(activeFilters).length > 0 && (
-          <Space wrap style={{ marginBottom: 16 }}>
-            <Typography.Text strong>Bộ lọc đang áp dụng:</Typography.Text>
-            {renderActiveFilters()}
-          </Space>
-        )}
-
-        <Table
-          columns={columns}
-          dataSource={items}
-          loading={loading}
-          pagination={{
-            ...pagination,
-            showTotal: (total) => `Tổng số ${total} bản ghi`,
-            showSizeChanger: true,
-            showQuickJumper: false,
-          }}
-          onChange={handleTableChange}
-          rowKey={(record) => record.id || record._id}
-          size="middle"
+      <Flex justify="flex-end">
+        <Pagination
+          {...pagination}
+          showTotal={(total) => `Tổng số ${total} bản ghi`}
+          showSizeChanger={true}
+          showQuickJumper={false}
+          onChange={(page, pageSize) =>
+            handleTableChange(
+              { ...pagination, pageSize, current: page },
+              null,
+              null
+            )
+          }
         />
-      </Space>
-    </Card>
+      </Flex>
+    </Space>
   );
 };
 

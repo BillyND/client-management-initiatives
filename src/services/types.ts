@@ -16,11 +16,14 @@ export interface User {
   accessToken?: string;
   refreshToken?: string;
   role: string;
+  phone: string;
+  department: string;
+  position: string;
 }
 
 export interface Initiative {
   name: string;
-  unit: string;
+  department: string;
   position: string;
   email: string;
   initiativeName: string;
@@ -51,4 +54,11 @@ export interface Report {
   };
   period: string;
   createdAt: string;
+}
+
+export interface EditProfileFormData {
+  name: string;
+  phone: string;
+  department: string;
+  position: string;
 }

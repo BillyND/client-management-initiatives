@@ -3,6 +3,8 @@ import { useAuthStore } from "../store/useAuthStore";
 
 // Base URL for API requests
 const baseURL = import.meta.env.VITE_API_URL;
+const MAX_REFRESH_TOKEN_REQUEST_COUNT = 1;
+let refreshTokenRequestCount = 0;
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
@@ -29,6 +31,7 @@ const getRequestKey = (config: any) => {
 // Cancel previous requests with same key
 const cancelPendingRequests = (config: any) => {
   const requestKey = getRequestKey(config);
+
   if (pendingRequests.has(requestKey)) {
     const cancelToken = pendingRequests.get(requestKey);
     cancelToken.cancel(`Canceled due to duplicate request: ${requestKey}`);
@@ -51,7 +54,6 @@ apiClient.interceptors.request.use(
 
     // Store this request's cancel token
     pendingRequests.set(getRequestKey(config), source);
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -63,6 +65,7 @@ apiClient.interceptors.response.use(
   (response) => {
     // Remove completed request from pending
     pendingRequests.delete(getRequestKey(response.config));
+
     return response;
   },
 
@@ -80,9 +83,18 @@ apiClient.interceptors.response.use(
     const email = authStore.user?.email;
 
     // If no refresh token available, reject immediately
-    if (!refreshToken || !email) {
+    if (
+      !refreshToken ||
+      !email ||
+      refreshTokenRequestCount > MAX_REFRESH_TOKEN_REQUEST_COUNT
+    ) {
+      // Reset refresh token request count
+      refreshTokenRequestCount = 0;
       return Promise.reject(error);
     }
+
+    // Increment refresh token request count
+    refreshTokenRequestCount++;
 
     try {
       // Attempt to refresh the access token

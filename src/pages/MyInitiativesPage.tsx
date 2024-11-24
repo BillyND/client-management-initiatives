@@ -1,5 +1,5 @@
 import { EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { Button, Grid, Space, Tag } from "antd";
+import { Button, Grid, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import React from "react";
 import DataSourceListTable from "../components/ListTable";
@@ -77,21 +77,26 @@ const MyInitiativesPage: React.FC = () => {
       key: "action",
       width: screens.xs ? 100 : "auto",
       render: (_, record) => (
-        <Space size="small" direction={screens.xs ? "vertical" : "horizontal"}>
-          <Button
-            type="primary"
-            ghost
-            size="small"
-            onClick={() => handleViewDetail(record._id)}
-            icon={<EyeOutlined />}
-          ></Button>
-          {record.status === "pending" && (
+        <Space size="small" direction={"horizontal"}>
+          <Tooltip title="Xem chi tiết">
             <Button
-              type="default"
-              size="small"
-              onClick={() => handleEdit(record._id)}
-              icon={<EditOutlined />}
-            ></Button>
+              type="link"
+              size="middle"
+              onClick={() => handleViewDetail(record._id)}
+              icon={<EyeOutlined />}
+              style={{ color: "#1890ff" }}
+            />
+          </Tooltip>
+          {record.status === "pending" && (
+            <Tooltip title="Chỉnh sửa">
+              <Button
+                type="link"
+                size="middle"
+                onClick={() => handleEdit(record._id)}
+                icon={<EditOutlined />}
+                style={{ color: "#52c41a" }}
+              />
+            </Tooltip>
           )}
         </Space>
       ),

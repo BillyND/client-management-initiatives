@@ -42,13 +42,17 @@ export const useAuthStore = create<AuthState>()(
           ...(tokens?.refresh ? { refreshToken: tokens.refresh } : {}),
           ...(user ? { isAuthenticated: true } : {}),
         }),
-      logout: () =>
+      logout: () => {
         set({
           user: null,
           accessToken: "",
           refreshToken: "",
           isAuthenticated: false,
-        }),
+        });
+
+        // Redirect to auth page
+        window.location.href = "/auth";
+      },
     }),
     {
       name: "auth-storage",

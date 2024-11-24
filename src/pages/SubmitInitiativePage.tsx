@@ -1,12 +1,24 @@
 import { Button, Form, Input, message, Typography } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { Initiative, initiativeService } from "../services";
+import { useAuthStore } from "../store/useAuthStore";
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
 const SubmitInitiativePage: React.FC = () => {
   const [form] = Form.useForm();
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue({
+        department: user.department,
+        position: user.position,
+        email: user.email,
+      });
+    }
+  }, [form, user]);
 
   const onFinish = async (values: Initiative) => {
     await initiativeService.create(values);
@@ -16,10 +28,21 @@ const SubmitInitiativePage: React.FC = () => {
 
   return (
     <div className="submit-initiative">
-      <Title level={2}>Gửi sáng kiến</Title>
+      <Title level={4}>Gửi sáng kiến</Title>
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Title level={4}>Thông tin cá nhân</Title>
-        <Form.Item name="unit" label="Đơn vị" rules={[{ required: true }]}>
+        <Form.Item
+          name="email"
+          label="Email"
+          rules={[{ required: true, type: "email" }]}
+        >
+          <Input disabled />
+        </Form.Item>
+        <Form.Item
+          name="department"
+          label="Đơn vị"
+          rules={[{ required: true }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item name="position" label="Chức vụ" rules={[{ required: true }]}>

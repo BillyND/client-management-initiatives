@@ -54,7 +54,14 @@ const AuthPage: React.FC = () => {
       await authService.register(values.email, values.password, values.name);
       message.success("Đăng ký thành công! Vui lòng đăng nhập.");
       registerForm.resetFields();
-      // Switch to login tab after successful registration
+
+      // Auto fill login form
+      loginForm.setFieldsValue({
+        email: values.email,
+        password: values.password,
+      });
+
+      // Switch to login tab
       setActiveTab("login");
     } catch (error: any) {
       message.error(error.response?.data?.message || "Đăng ký thất bại");
