@@ -1,64 +1,62 @@
 import { Link } from "react-router-dom";
 import { User } from "../services";
+import { ROLES } from "../common/enums/roles.enum";
 
 export const getMenuItems = (user: User | null) => {
   const menuItems = [];
 
-  switch (user?.role) {
-    case "user":
-      menuItems.push(
-        {
-          key: "/my-initiatives",
-          label: <Link to="/my-initiatives">Sáng kiến của tôi</Link>,
-        },
-        {
-          key: "/submit-initiative",
-          label: <Link to="/submit-initiative">Gửi sáng kiến</Link>,
-        }
-      );
-      break;
+  if (user?.roles?.includes(ROLES.USER)) {
+    menuItems.push(
+      {
+        key: "/my-initiatives",
+        label: <Link to="/my-initiatives">Sáng kiến của tôi</Link>,
+      },
+      {
+        key: "/submit-initiative",
+        label: <Link to="/submit-initiative">Gửi sáng kiến</Link>,
+      }
+    );
+  }
 
-    case "admin":
-      menuItems.push(
-        {
-          key: "/initiatives",
-          label: <Link to="/initiatives">Quản lý sáng kiến</Link>,
-        },
-        {
-          key: "/users",
-          label: <Link to="/users">Quản lý người dùng</Link>,
-        },
-        {
-          key: "/reports",
-          label: <Link to="/reports">Báo cáo thống kê</Link>,
-        }
-      );
-      break;
-
-    case "evaluator":
-      menuItems.push({
-        key: "/evaluate",
-        label: <Link to="/evaluate">Chấm điểm sáng kiến</Link>,
-      });
-      break;
-
-    case "manager":
-      menuItems.push({
+  if (user?.roles?.includes(ROLES.ADMIN)) {
+    menuItems.push(
+      {
+        key: "/initiatives",
+        label: <Link to="/initiatives">Quản lý sáng kiến</Link>,
+      },
+      {
+        key: "/users",
+        label: <Link to="/users">Quản lý người dùng</Link>,
+      },
+      {
         key: "/reports",
         label: <Link to="/reports">Báo cáo thống kê</Link>,
-      });
-      break;
-
-    case "secretary":
-      menuItems.push({
-        key: "/review",
-        label: <Link to="/review">Kiểm tra hồ sơ</Link>,
-      });
-      break;
-
-    default:
-      break;
+      }
+    );
   }
+
+  if (user?.roles?.includes("EVALUATOR")) {
+    menuItems.push({
+      key: "/evaluate",
+      label: <Link to="/evaluate">Chấm điểm sáng kiến</Link>,
+    });
+  }
+
+  if (user?.roles?.includes(ROLES.MANAGER)) {
+    menuItems.push({
+      key: "/reports",
+      label: <Link to="/reports">Báo cáo thống kê</Link>,
+    });
+  }
+
+  if (user?.roles?.includes("SECRETARY")) {
+    menuItems.push({
+      key: "/review",
+      label: <Link to="/review">Kiểm tra hồ sơ</Link>,
+    });
+  }
+
+  console.log("===>menuItems", menuItems);
 
   return menuItems;
 };

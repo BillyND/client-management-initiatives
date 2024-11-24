@@ -15,7 +15,7 @@ export interface User {
   name: string;
   accessToken?: string;
   refreshToken?: string;
-  role: string;
+  roles: string[];
   phone: string;
   department: string;
   position: string;

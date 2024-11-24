@@ -57,7 +57,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     setIsLoading(true);
     try {
-      const { user } = await authService.verifyToken();
+      const user = await authService.verifyToken();
       setAuth(user);
       navigate(user ? pathname : "/auth");
     } catch {

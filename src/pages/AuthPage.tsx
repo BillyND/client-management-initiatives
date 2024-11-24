@@ -29,7 +29,8 @@ const AuthPage: React.FC = () => {
       setLoading(true);
       const response = await authService.login(values.email, values.password);
 
-      if (response.success) {
+      if (response.user) {
+        console.log(response.user);
         message.success("Đăng nhập thành công!");
 
         // Redirect to home page after successful login
