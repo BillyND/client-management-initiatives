@@ -12,7 +12,6 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services";
-import { useAuthStore } from "../store/useAuthStore";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -21,9 +20,6 @@ const AuthPage: React.FC = () => {
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
   const navigate = useNavigate();
-  const data = useAuthStore.getState();
-
-  console.log("===>user", data);
 
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
@@ -68,11 +64,7 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <Row
-      justify="center"
-      align="middle"
-      style={{ height: "100%", backgroundColor: "#f0f2f5" }}
-    >
+    <Row justify="center" align="middle">
       <Col xs={22} sm={16} md={12} lg={8} xl={6}>
         <Title
           level={2}

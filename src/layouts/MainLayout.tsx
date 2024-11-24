@@ -1,8 +1,8 @@
 import { Layout, Menu, Typography } from "antd";
 import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
 import useBreakpoints from "../hooks/useBreakpoints";
+import { useAuthStore } from "../store/useAuthStore";
 import { getMenuItems } from "./fns";
 
 const { Header, Content } = Layout;
@@ -17,19 +17,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   if (isAuthPage) {
     return (
-      <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
-        <Content
-          style={{
-            padding: 24,
-            margin: "24px auto",
-            maxWidth: 1200,
-            background: "#fff",
-            borderRadius: 8,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          {children}
-        </Content>
+      <Layout style={{ minHeight: "100vh", background: "#EFF2F5" }}>
+        {children}
       </Layout>
     );
   }
