@@ -8,6 +8,14 @@ const baseURL = import.meta.env.VITE_API_URL;
 const apiClient = axios.create({
   baseURL,
   timeout: 10000,
+
+  // Allow sending cookies in cross-origin requests
+  withCredentials: true,
+
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 // Request interceptor
