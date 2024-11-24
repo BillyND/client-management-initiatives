@@ -18,11 +18,40 @@ const apiClient = axios.create({
   },
 });
 
+// Store pending requests
+const pendingRequests = new Map();
+
+// Generate request key from config
+const getRequestKey = (config: any) => {
+  return `${config.method}-${config.url}`;
+};
+
+// Cancel previous requests with same key
+const cancelPendingRequests = (config: any) => {
+  const requestKey = getRequestKey(config);
+  if (pendingRequests.has(requestKey)) {
+    const cancelToken = pendingRequests.get(requestKey);
+    cancelToken.cancel(`Canceled due to duplicate request: ${requestKey}`);
+    pendingRequests.delete(requestKey);
+  }
+};
+
 // Request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
     const accessToken = useAuthStore.getState().accessToken;
     config.headers["Authorization"] = `Bearer ${accessToken}`;
+
+    // Cancel any pending requests to the same endpoint
+    cancelPendingRequests(config);
+
+    // Create new cancel token
+    const source = axios.CancelToken.source();
+    config.cancelToken = source.token;
+
+    // Store this request's cancel token
+    pendingRequests.set(getRequestKey(config), source);
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -31,7 +60,11 @@ apiClient.interceptors.request.use(
 // Response interceptor to handle API responses and token refresh
 apiClient.interceptors.response.use(
   // Success handler - pass through response
-  (response) => response,
+  (response) => {
+    // Remove completed request from pending
+    pendingRequests.delete(getRequestKey(response.config));
+    return response;
+  },
 
   // Error handler with token refresh logic
   async (error) => {
