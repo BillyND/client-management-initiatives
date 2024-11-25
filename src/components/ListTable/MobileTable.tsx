@@ -10,7 +10,7 @@ export const MobileTable: React.FC<SharedTableProps> = ({
 }) => {
   const renderListItem = (item: any) => (
     <List.Item>
-      <Card style={{ width: "100%" }}>
+      <Card style={{ width: "100%", padding: 12 }}>
         {columns.map((column, index) => {
           const { dataIndex, title, render } = column as ColumnType<any>;
           const value = render

@@ -1,4 +1,4 @@
-import { Card, Descriptions, Typography } from "antd";
+import { Descriptions, Typography } from "antd";
 import { useAuthStore } from "../store/useAuthStore";
 
 const { Title } = Typography;
@@ -63,7 +63,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 800, margin: "0 auto" }}>
+    <div style={{ maxWidth: 800, margin: "0 auto" }}>
       <div
         style={{
           display: "flex",
@@ -72,37 +72,36 @@ export default function ProfilePage() {
           marginBottom: 24,
         }}
       >
-        <Title level={2}>Thông tin cá nhân</Title>
+        <Title level={4}>Thông tin cá nhân</Title>
         <Button type="primary" onClick={handleEdit}>
           Chỉnh sửa
         </Button>
       </div>
 
-      <Card>
-        <Descriptions column={1} bordered>
-          <Descriptions.Item label="Họ và tên">
-            {user?.name || "N/A"}
-          </Descriptions.Item>
-          <Descriptions.Item label="Email">
-            {user?.email || "N/A"}
-          </Descriptions.Item>
-          <Descriptions.Item label="Số điện thoại">
-            {user?.phone || "N/A"}
-          </Descriptions.Item>
-          <Descriptions.Item label="Đơn vị">
-            {user?.department || "N/A"}
-          </Descriptions.Item>
-          <Descriptions.Item label="Chức vụ">
-            {user?.position || "N/A"}
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
+      <Descriptions column={1} bordered>
+        <Descriptions.Item label="Họ và tên">
+          {user?.name || "N/A"}
+        </Descriptions.Item>
+        <Descriptions.Item label="Email">
+          {user?.email || "N/A"}
+        </Descriptions.Item>
+        <Descriptions.Item label="Số điện thoại">
+          {user?.phone || "N/A"}
+        </Descriptions.Item>
+        <Descriptions.Item label="Đơn vị">
+          {user?.department || "N/A"}
+        </Descriptions.Item>
+        <Descriptions.Item label="Chức vụ">
+          {user?.position || "N/A"}
+        </Descriptions.Item>
+      </Descriptions>
 
       <Modal
         title="Chỉnh sửa thông tin"
         open={isEditing}
         onCancel={() => setIsEditing(false)}
         footer={null}
+        maskClosable={false}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
