@@ -1,5 +1,5 @@
 import { LockOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Input, message } from "antd";
+import { Button, Col, Form, Input, message, Row, Typography } from "antd";
 import { useState } from "react";
 import { authService } from "../services";
 
@@ -24,9 +24,10 @@ const ChangePassword: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: "40px auto", padding: "0 16px" }}>
-      <Card title="Đổi mật khẩu">
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+    <Row justify="center" align="middle">
+      <Col xs={23} sm={20} md={16} lg={12} xl={8}>
+        <Typography.Title level={4}>Đổi mật khẩu</Typography.Title>
+        <Form form={form} layout="vertical" onFinish={onFinish} size="large">
           <Form.Item
             name="currentPassword"
             label="Mật khẩu hiện tại"
@@ -95,8 +96,8 @@ const ChangePassword: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-      </Card>
-    </div>
+      </Col>
+    </Row>
   );
 };
 
