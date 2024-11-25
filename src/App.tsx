@@ -47,29 +47,42 @@ const App: React.FC = () => {
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuthStore();
-
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isAuthPage = pathname === "/auth";
 
+  // Handle authentication verification and navigation
+  const handleAuthVerification = useCallback(
+    async (user: any) => {
+      setAuth(user);
+
+      if (user) {
+        navigate(isAuthPage ? "/" : pathname);
+      } else {
+        navigate("/auth");
+      }
+    },
+    [setAuth, navigate, isAuthPage, pathname]
+  );
+
+  // Verify authentication status
   const verifyAuth = useCallback(async () => {
     if (isLoading) return;
 
     setIsLoading(true);
     try {
       const user = await authService.verifyToken();
-      setAuth(user);
-      navigate(user ? pathname : "/auth");
-    } catch {
+      await handleAuthVerification(user);
+    } catch (error) {
+      console.log(error);
       navigate("/auth");
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, setAuth, navigate, pathname]);
+  }, [isLoading, handleAuthVerification, navigate]);
 
   useEffect(() => {
     verifyAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthPage]);
 
   if (isLoading) {

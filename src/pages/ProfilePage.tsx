@@ -5,7 +5,7 @@ const { Title } = Typography;
 
 import { Button, Form, Input, Modal, message } from "antd";
 import { useState } from "react";
-import { authService } from "../services";
+import { userService } from "../services/userService";
 
 interface EditProfileFormData {
   name: string;
@@ -50,9 +50,8 @@ export default function ProfilePage() {
   const handleSubmit = async (values: EditProfileFormData) => {
     try {
       setIsSubmitting(true);
-      const response = await authService.updateProfile(values);
-
-      setAuth(response?.user);
+      const user = await userService.updateProfile(values);
+      setAuth(user);
       setIsEditing(false);
       message.success("Cập nhật thông tin thành công");
     } catch (error) {

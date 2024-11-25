@@ -1,6 +1,5 @@
 import { useAuthStore } from "../store/useAuthStore";
 import apiClient from "../utils/apiClient";
-import { EditProfileFormData, User } from "./types";
 
 export const authService = {
   async login(email: string, password: string) {
@@ -45,11 +44,6 @@ export const authService = {
     newPassword: string;
   }) => {
     const response = await apiClient.post("/auth/change-password", payload);
-    return response.data;
-  },
-
-  async updateProfile(data: EditProfileFormData): Promise<{ user: User }> {
-    const response = await apiClient.put("/auth/profile", data);
     return response.data;
   },
 };
