@@ -117,7 +117,14 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 <Form.Item
                   name="email"
                   label="Email"
-                  rules={[{ type: "email", message: "Email không hợp lệ" }]}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập email" },
+                    { type: "email", message: "Email không hợp lệ" },
+                    {
+                      max: 254,
+                      message: "Email không được vượt quá 254 ký tự",
+                    },
+                  ]}
                 >
                   <Input disabled={true} />
                 </Form.Item>
@@ -127,9 +134,15 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   name="name"
                   label="Họ và tên"
                   rules={[
+                    { required: true, message: "Vui lòng nhập họ và tên" },
                     {
                       type: "string",
                       message: "Họ và tên phải là chuỗi ký tự",
+                    },
+                    { min: 2, message: "Họ và tên phải có ít nhất 2 ký tự" },
+                    {
+                      max: 50,
+                      message: "Họ và tên không được vượt quá 50 ký tự",
                     },
                   ]}
                 >
@@ -148,6 +161,19 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                       type: "string",
                       message: "Số điện thoại phải là chuỗi ký tự",
                     },
+                    {
+                      pattern: /^[0-9+\-\s()]+$/,
+                      message:
+                        "Số điện thoại chỉ được chứa số và các ký tự +, -, (), khoảng trắng",
+                    },
+                    {
+                      min: 10,
+                      message: "Số điện thoại phải có ít nhất 10 ký tự",
+                    },
+                    {
+                      max: 15,
+                      message: "Số điện thoại không được vượt quá 15 ký tự",
+                    },
                   ]}
                 >
                   <Input />
@@ -161,6 +187,10 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                     {
                       type: "string",
                       message: "Phòng ban phải là chuỗi ký tự",
+                    },
+                    {
+                      max: 50,
+                      message: "Phòng ban không được vượt quá 50 ký tự",
                     },
                   ]}
                 >
@@ -176,6 +206,10 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                   label="Chức vụ"
                   rules={[
                     { type: "string", message: "Chức vụ phải là chuỗi ký tự" },
+                    {
+                      max: 50,
+                      message: "Chức vụ không được vượt quá 50 ký tự",
+                    },
                   ]}
                 >
                   <Input />
