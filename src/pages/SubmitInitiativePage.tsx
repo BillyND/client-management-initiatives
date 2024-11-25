@@ -1,7 +1,8 @@
 import { Button, Form, Input, message, Typography } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Initiative, initiativeService } from "../services";
 import { useAuthStore } from "../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -9,6 +10,8 @@ const { TextArea } = Input;
 const SubmitInitiativePage: React.FC = () => {
   const [form] = Form.useForm();
   const user = useAuthStore((state) => state.user);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -21,9 +24,18 @@ const SubmitInitiativePage: React.FC = () => {
   }, [form, user]);
 
   const onFinish = async (values: Initiative) => {
-    await initiativeService.create(values);
-    message.success("Sáng kiến đã được gửi thành công!");
-    // form.resetFields();
+    try {
+      setLoading(true);
+      await initiativeService.create(values);
+      message.success("Sáng kiến đã được gửi thành công!");
+      form.resetFields();
+      navigate("/my-initiatives");
+    } catch (error) {
+      console.log(error);
+      message.error("Có lỗi xảy ra khi gửi sáng kiến!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,7 +109,7 @@ const SubmitInitiativePage: React.FC = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Gửi sáng kiến
           </Button>
         </Form.Item>

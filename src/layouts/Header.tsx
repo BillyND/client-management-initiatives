@@ -1,22 +1,29 @@
-import { LockOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Grid, Layout, Menu, Popover, Typography } from "antd";
-import { useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { authService } from "../services";
+import {
+  LockOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Avatar, Button, Layout, Popover } from "antd";
 import { useAuthStore } from "../store/useAuthStore";
-import { getMenuItems } from "./fns";
+import { useState } from "react";
+import { authService } from "../services";
+import { useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
-const { Title } = Typography;
-const { useBreakpoint } = Grid;
 
-export const MainHeader: React.FC = () => {
-  const location = useLocation();
+interface MainHeaderProps {
+  collapsed: boolean;
+  onCollapse: (collapsed: boolean) => void;
+}
+
+export const MainHeader: React.FC<MainHeaderProps> = ({
+  collapsed,
+  onCollapse,
+}) => {
   const navigate = useNavigate();
-
   const { user } = useAuthStore((state) => state);
-  const menuItems = useMemo(() => getMenuItems(user), [user]);
-  const { xs } = useBreakpoint();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -80,31 +87,23 @@ export const MainHeader: React.FC = () => {
     <Header
       style={{
         background: "#fff",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
         padding: "0 16px",
         display: "flex",
         alignItems: "center",
+        justifyContent: "space-between",
         position: "sticky",
         top: 0,
         zIndex: 1000,
-        justifyContent: "space-between",
+        height: 64,
+        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-        {!xs && (
-          <Link to="/" style={{ textDecoration: "none", marginRight: 24 }}>
-            <Title level={4} style={{ margin: 0, color: "#1890ff" }}>
-              Sáng Kiến
-            </Title>
-          </Link>
-        )}
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          style={{ flex: 1, border: "none" }}
-        />
-      </div>
+      <Button
+        type="text"
+        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => onCollapse(!collapsed)}
+        style={{ fontSize: "16px", width: 64, height: 64 }}
+      />
 
       <Popover
         content={userMenu}
@@ -114,11 +113,7 @@ export const MainHeader: React.FC = () => {
         open={isPopoverOpen}
         onOpenChange={setIsPopoverOpen}
       >
-        <Avatar
-          size={40}
-          className="prevent-copy"
-          style={{ cursor: "pointer" }}
-        >
+        <Avatar size={40} style={{ cursor: "pointer" }}>
           {user?.name?.[0] || "U"}
         </Avatar>
       </Popover>

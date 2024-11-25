@@ -3,7 +3,7 @@ import viVN from "antd/lib/locale/vi_VN";
 import React, { useCallback, useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { LoadingScreen } from "./components/LoadingScreen";
-import MainLayout from "./layouts/MainLayout";
+import { MainLayout } from "./layouts/MainLayout";
 import AuthPage from "./pages/AuthPage";
 import EvaluationPage from "./pages/EvaluationPage";
 import HomePage from "./pages/HomePage";
