@@ -33,8 +33,9 @@ export const MainSider: React.FC<MainSiderProps> = ({
       zIndex: 999,
       transform: screens.xs && collapsed ? "translateX(-100%)" : "none",
       transition: "transform 0.2s",
-      background: "var(--ant-color-bg-container)",
-      boxShadow: "var(--ant-boxShadow-1)",
+      background: "#ffffff",
+      boxShadow:
+        "0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)",
     }),
     [screens.xs, collapsed]
   );
@@ -46,7 +47,11 @@ export const MainSider: React.FC<MainSiderProps> = ({
   };
 
   const logoContent = (
-    <Flex align="center" justify="center" style={{ position: "relative" }}>
+    <Flex
+      align="center"
+      justify="center"
+      style={{ position: "relative", backgroundColor: "#f3f3f3" }}
+    >
       <Flex
         align="center"
         justify="center"
@@ -84,7 +89,6 @@ export const MainSider: React.FC<MainSiderProps> = ({
       selectedKeys={[location.pathname]}
       items={menuItems}
       theme="light"
-      style={{ borderRight: 0 }}
       onClick={handleMenuClick}
     />
   );
@@ -110,7 +114,7 @@ export const MainSider: React.FC<MainSiderProps> = ({
       >
         <div
           className="p-4 text-center"
-          style={{ borderBottom: "1px solid var(--ant-color-border)" }}
+          style={{ borderBottom: "1px solid #f0f0f0" }}
         >
           {logoContent}
         </div>
@@ -128,12 +132,7 @@ export const MainSider: React.FC<MainSiderProps> = ({
       width={260}
       style={siderStyle}
     >
-      <div
-        className="p-4 text-center"
-        style={{ borderBottom: "1px solid var(--ant-color-border)" }}
-      >
-        {logoContent}
-      </div>
+      {logoContent}
       {menuContent}
     </Sider>
   );
