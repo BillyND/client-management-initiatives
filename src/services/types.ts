@@ -19,7 +19,19 @@ export interface User {
   phone: string;
   department: string;
   position: string;
+  isActive: boolean;
 }
+
+export interface Department {
+  label: string;
+  value: string;
+}
+
+export const DEPARTMENTS: Department[] = [
+  { label: "Phòng Kỹ thuật", value: "technical" },
+  { label: "Phòng Nhân sự", value: "hr" },
+  { label: "Phòng Kinh doanh", value: "sales" },
+];
 
 export interface Initiative {
   name: string;

@@ -24,6 +24,7 @@ export interface WithDataSourceChildProps {
     queryValue?: string;
     [key: string]: any;
   };
+  isRefetching?: object;
   pagination: TablePaginationConfig;
   setPagination: (config: TablePaginationConfig) => void;
   setSort: (sort: string[]) => void;
@@ -43,6 +44,7 @@ export default function withDataSource(
       dataSource = "",
       onlyLocalData = false,
       abbreviated = false,
+      isRefetching,
       ...otherProps
     } = props;
 
@@ -254,9 +256,11 @@ export default function withDataSource(
       abbreviated,
     ]);
 
+    console.log("isRefetching", isRefetching);
+
     useEffect(() => {
       fetchData();
-    }, [dataSource, fetchData]);
+    }, [dataSource, fetchData, isRefetching]);
 
     return (
       <Component

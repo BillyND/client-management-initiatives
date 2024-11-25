@@ -15,6 +15,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import MyInitiativesPage from "./pages/MyInitiativesPage";
 import ChangePassword from "./pages/ChangePassword";
 import ProfilePage from "./pages/ProfilePage";
+import UserManagementPage from "./pages/UserManagementPage";
 
 const App: React.FC = () => {
   return (
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="users" element={<UserManagementPage />} />
           </Routes>
         </MainLayout>
       </AuthWrapper>
@@ -83,6 +85,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     verifyAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthPage]);
 
   if (isLoading) {
