@@ -33,4 +33,14 @@ export const userService = {
       throw new Error("Failed to update user" + error);
     }
   },
+
+  async updateProfile(data: Partial<User>): Promise<User> {
+    try {
+      const response = await apiClient.put(`/users/profile`, data);
+      if (response.status !== 200) throw new Error("Failed to update profile");
+      return response.data;
+    } catch (error) {
+      throw new Error("Failed to update profile" + error);
+    }
+  },
 };
