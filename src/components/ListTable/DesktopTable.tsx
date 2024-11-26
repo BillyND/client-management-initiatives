@@ -1,14 +1,16 @@
 import { Table } from "antd";
 import React from "react";
-import { SharedTableProps } from "./index";
+import { SharedTableProps } from ".";
 
 export const DesktopTable: React.FC<SharedTableProps> = ({
   items,
   loading,
   columns,
+  handleTableChange,
 }) => {
   return (
     <Table
+      onChange={handleTableChange}
       columns={columns}
       dataSource={items}
       loading={loading}

@@ -39,10 +39,10 @@ export const authService = {
     return response.data;
   },
 
-  changePassword: async (payload: {
+  async changePassword(payload: {
     currentPassword: string;
     newPassword: string;
-  }) => {
+  }) {
     const response = await apiClient.post("/auth/change-password", payload);
     return response.data;
   },

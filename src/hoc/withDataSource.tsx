@@ -256,8 +256,6 @@ export default function withDataSource(
       abbreviated,
     ]);
 
-    console.log("isRefetching", isRefetching);
-
     useEffect(() => {
       fetchData();
     }, [dataSource, fetchData, isRefetching]);

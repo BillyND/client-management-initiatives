@@ -1,7 +1,7 @@
 import { Card, Flex, List, Space, Typography } from "antd";
 import { ColumnType } from "antd/es/table";
 import React from "react";
-import { SharedTableProps } from "./index";
+import { SharedTableProps } from ".";
 
 export const MobileTable: React.FC<SharedTableProps> = ({
   items,

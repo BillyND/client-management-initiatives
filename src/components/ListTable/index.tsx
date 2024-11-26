@@ -21,6 +21,7 @@ import withDataSource, {
 import useBreakpoints from "../../hooks/useBreakpoints";
 import { DesktopTable } from "./DesktopTable";
 import { MobileTable } from "./MobileTable";
+import { isEmpty } from "lodash";
 
 export interface ListTableProps extends WithDataSourceChildProps {
   title?: string;
@@ -38,6 +39,7 @@ export interface SharedTableProps {
   items: any[];
   loading: boolean;
   columns: ColumnsType<any>;
+  handleTableChange: (newPagination: any, _: any, sorter: any) => void;
 }
 
 const ListTable: React.FC<ListTableProps> = ({
@@ -69,7 +71,9 @@ const ListTable: React.FC<ListTableProps> = ({
   };
 
   const handleTableChange = (newPagination: any, _: any, sorter: any) => {
-    setPagination(newPagination);
+    if (!isEmpty(newPagination)) {
+      setPagination(newPagination);
+    }
 
     if (sorter.field && sorter.order) {
       setSort([`${sorter.field} ${sorter.order}`]);
@@ -173,6 +177,7 @@ const ListTable: React.FC<ListTableProps> = ({
     items,
     loading,
     columns,
+    handleTableChange,
   };
 
   const { isMobile } = useBreakpoints();
