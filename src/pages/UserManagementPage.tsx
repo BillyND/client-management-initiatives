@@ -2,10 +2,10 @@ import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Grid, Space, Tag, Tooltip } from "antd";
 import { useCallback, useState } from "react";
 import DataSourceListTable from "../components/ListTable";
-import { EditUserModal } from "../components/Users/EditUserModal";
-import { ViewUserModal } from "../components/Users/ViewUserModal";
+import { EditUserModal } from "../components/Users2/EditUserModal";
+import { ViewUserModal } from "../components/Users2/ViewUserModal";
 import { User } from "../services";
-import { UserRoleModal } from "../components/Users/UserRoleModal";
+import { UserRoleModal } from "../components/Users2/UserRoleModal";
 
 const { useBreakpoint } = Grid;
 
