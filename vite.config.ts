@@ -14,4 +14,25 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Minify bundle
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        // drop_console: true, // Remove console.log
+        // drop_debugger: true, // Remove debugger statements
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split large libraries into separate chunks
+          vendor: ["react", "react-dom"],
+        },
+      },
+    },
+    // Compress assets
+    assetsInlineLimit: 4096,
+    chunkSizeWarningLimit: 500,
+  },
 });

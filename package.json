@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.13",
     "@types/node": "^22.9.3",
