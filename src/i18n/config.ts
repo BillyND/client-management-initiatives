@@ -21,7 +21,18 @@ const resources = Object.keys(translations).reduce((acc, path) => {
   };
 }, {});
 
-console.log(resources);
+// Set default language to en if not set and localStorage is available
+try {
+  if (
+    typeof window !== "undefined" &&
+    window.localStorage &&
+    localStorage.getItem("i18nextLng") === null
+  ) {
+    localStorage.setItem("i18nextLng", "vi");
+  }
+} catch (error) {
+  console.warn("Unable to access localStorage:", error);
+}
 
 i18n
   .use(Backend)
@@ -29,8 +40,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "vi", // Default language
-    fallbackLng: "vi", // Fallback language
+    fallbackLng: "vi",
     defaultNS: "translation",
     ns: ["translation"],
     debug: import.meta.env.NODE_ENV === "development", // Check development environment using Vite env

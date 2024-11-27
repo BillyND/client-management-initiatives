@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { getMenuItems } from "./fns";
+import { useTranslation } from "react-i18next";
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -18,6 +19,7 @@ export const MainSider: React.FC<MainSiderProps> = ({
   collapsed,
   onCollapse,
 }) => {
+  const { t } = useTranslation();
   const screens = useBreakpoint();
   const location = useLocation();
   const { user } = useAuthStore((state) => state);
@@ -63,7 +65,7 @@ export const MainSider: React.FC<MainSiderProps> = ({
           onClick={() => screens.xs && onCollapse?.(true)}
         >
           <Title level={4} style={{ margin: 0 }}>
-            {screens.xs || !collapsed ? "Sáng Kiến" : "SK"}
+            {screens.xs || !collapsed ? t("initiative") : "SK"}
           </Title>
         </Link>
       </Flex>

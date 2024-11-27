@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import withDataSource, {
   WithDataSourceChildProps,
 } from "../../hoc/withDataSource";
@@ -55,6 +56,8 @@ const ListTable: React.FC<ListTableProps> = ({
   setSort,
   title,
 }) => {
+  const { t } = useTranslation();
+
   // Shared states
   const [searchText, setSearchText] = useState("");
   const [activeFilters, setActiveFilters] = useState<{ [key: string]: string }>(
@@ -149,7 +152,7 @@ const ListTable: React.FC<ListTableProps> = ({
           strong
           style={{ display: "block", marginBottom: "8px" }}
         >
-          Thứ tự sắp xếp:
+          {t("sort-order")}:
         </Typography.Text>
         <Radio.Group
           onChange={(e) => {
@@ -162,10 +165,10 @@ const ListTable: React.FC<ListTableProps> = ({
         >
           <Space direction="vertical" size="middle">
             <Radio value="asc" style={{ fontSize: "14px" }}>
-              <span style={{ color: "#595959" }}>Tăng dần</span>
+              <span style={{ color: "#595959" }}>{t("ascending")}</span>
             </Radio>
             <Radio value="desc" style={{ fontSize: "14px" }}>
-              <span style={{ color: "#595959" }}>Giảm dần</span>
+              <span style={{ color: "#595959" }}>{t("descending")}</span>
             </Radio>
           </Space>
         </Radio.Group>
@@ -194,7 +197,7 @@ const ListTable: React.FC<ListTableProps> = ({
       {title && <Typography.Title level={4}>{title}</Typography.Title>}
       <Space wrap>
         <Input.Search
-          placeholder="Tìm kiếm..."
+          placeholder={t("search")}
           allowClear
           onSearch={handleSearch}
           style={{ width: 200 }}
@@ -205,15 +208,15 @@ const ListTable: React.FC<ListTableProps> = ({
         <Tooltip
           title={
             selectedSortField
-              ? `Đang sắp xếp theo: ${
+              ? `${t("sorting-by")}: ${
                   columns.find((col) => col.key === selectedSortField)?.title
                 }`
-              : "Sắp xếp"
+              : t("sort")
           }
         >
           <Popover
             content={<SortPopoverContent />}
-            title="Sắp xếp"
+            title={t("sort")}
             trigger="click"
             placement="bottomLeft"
           >
@@ -221,7 +224,7 @@ const ListTable: React.FC<ListTableProps> = ({
               icon={<SortAscendingOutlined />}
               type={selectedSortField ? "primary" : "default"}
             >
-              Sắp xếp
+              {t("sort")}
             </Button>
           </Popover>
         </Tooltip>
@@ -239,6 +242,7 @@ const ListTable: React.FC<ListTableProps> = ({
                 })),
               })),
             }}
+            trigger={["click"]}
           >
             <Button
               icon={<FilterOutlined />}
@@ -246,7 +250,7 @@ const ListTable: React.FC<ListTableProps> = ({
                 Object.keys(activeFilters).length > 0 ? "primary" : "default"
               }
             >
-              Lọc
+              {t("filter")}
             </Button>
           </Dropdown>
         )}
@@ -254,7 +258,7 @@ const ListTable: React.FC<ListTableProps> = ({
 
       {Object.keys(activeFilters).length > 0 && (
         <Space wrap style={{ marginBottom: 16 }}>
-          <Typography.Text strong>Bộ lọc đang áp dụng:</Typography.Text>
+          <Typography.Text strong>{t("applied-filters")}:</Typography.Text>
           {renderActiveFilters()}
         </Space>
       )}
@@ -264,7 +268,7 @@ const ListTable: React.FC<ListTableProps> = ({
       <Flex justify="flex-end">
         <Pagination
           {...pagination}
-          showTotal={(total) => `Tổng số ${total} bản ghi`}
+          showTotal={(total) => t("total-total-records", { total })}
           showSizeChanger={true}
           showQuickJumper={false}
           onChange={(page, pageSize) =>

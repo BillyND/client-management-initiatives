@@ -57,8 +57,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAuthPage = pathname === "/auth";
 
   const [isLoading, setIsLoading] = useState(false);
-  const { setAuth, user, accessToken } = useAuthStore();
-  console.log("===>user", user, accessToken);
+  const { setAuth } = useAuthStore();
 
   // Verify authentication status
   const verifyAuth = useCallback(async () => {

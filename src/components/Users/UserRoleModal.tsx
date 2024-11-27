@@ -1,9 +1,11 @@
-import { message, Modal, Spin } from "antd";
+import { Grid, message, Modal, Spin } from "antd";
 import Transfer, { TransferItem } from "antd/es/transfer";
 import { Key, ReactNode, useEffect, useState } from "react";
 import { roleService } from "../../services/roleService";
 import { userService } from "../../services/userService";
 import { useTranslation } from "react-i18next";
+
+const { useBreakpoint } = Grid;
 
 interface UserRoleModalProps {
   userEmail: string | null;
@@ -31,11 +33,11 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [roles, setRoles] = useState<TransferItemType[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<Key[]>([]);
   const { t } = useTranslation();
+  const { xs } = useBreakpoint();
 
   // Constants for messages and titles
   const MESSAGES = {
@@ -50,8 +52,8 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
     WIDTH: 800,
     TRANSFER_TITLES: [t("available-roles"), t("assigned-roles")] as const,
     LIST_STYLE: {
-      width: 350,
-      height: 400,
+      width: `100%`,
+      height: xs ? 300 : 400,
     },
     OK_TEXT: t("confirm"),
     CANCEL_TEXT: t("cancel"),
@@ -106,7 +108,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
       if (!visible || !userEmail) return;
 
       try {
-        setFetchLoading(true);
+        setLoading(true);
         const [transformedRoles, userRoles] = await Promise.all([
           fetchRolesData(),
           fetchUserRoles(userEmail),
@@ -122,7 +124,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
           error.name !== "AbortError" && error.name !== "CanceledError";
 
         if (isMounted) {
-          setFetchLoading(false);
+          setLoading(false);
         }
 
         if (isNetworkError) {
@@ -132,7 +134,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
         }
       } finally {
         if (isMounted) {
-          setFetchLoading(false);
+          setLoading(false);
         }
       }
     };
@@ -143,7 +145,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [visible, userEmail, onClose]);
+  }, [visible, userEmail, onClose, MESSAGES.FETCH_ERROR]);
 
   // Handle form submission
   const handleSubmit = async () => {
@@ -238,7 +240,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
     const baseStyle = MODAL_CONFIG.LIST_STYLE;
 
     // Add red border for right panel when no roles selected
-    if (direction === "right" && selectedRoles.length === 0) {
+    if (direction === "right" && selectedRoles.length === 0 && !loading) {
       return {
         ...baseStyle,
         borderColor: "#ff4d4f",
@@ -266,7 +268,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
         title: MESSAGES.NO_ROLE_SELECTED,
       }}
     >
-      <Spin spinning={fetchLoading}>
+      <Spin spinning={loading}>
         <Transfer<TransferItemType>
           dataSource={roles}
           titles={MODAL_CONFIG.TRANSFER_TITLES as unknown as ReactNode[]}
@@ -277,6 +279,7 @@ export const UserRoleModal: React.FC<UserRoleModalProps> = ({
           showSearch
           filterOption={handleSearch}
           locale={TRANSFER_LOCALE}
+          style={{ flexDirection: xs ? "column" : "row", gap: 4 }} // New line added
         />
       </Spin>
     </Modal>

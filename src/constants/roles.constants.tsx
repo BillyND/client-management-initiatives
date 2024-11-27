@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { MenuItem } from "../layouts/fns";
+import i18n from "../i18n/config";
 
 export enum ROLES {
   SUPER_ADMIN = "super_admin",
@@ -28,52 +29,55 @@ interface RouteItem {
   icon: JSX.Element;
 }
 
+// Function to translate text
+const t = i18n.t;
+
 // Define route groups with proper typing
 const ROUTE_GROUPS: Record<string, RouteItem[]> = {
   INITIATIVE_MANAGEMENT: [
     {
       key: "/initiatives",
-      label: <Link to="/initiatives">Quản lý sáng kiến</Link>,
+      label: <Link to="/initiatives">{t("manage-initiatives")}</Link>,
       icon: <FolderOutlined />,
     },
   ],
   USER_MANAGEMENT: [
     {
       key: "/users",
-      label: <Link to="/users">Quản lý người dùng</Link>,
+      label: <Link to="/users">{t("manage-users")}</Link>,
       icon: <UserOutlined />,
     },
   ],
   REPORTS: [
     {
       key: "/reports",
-      label: <Link to="/reports">Báo cáo thống kê</Link>,
+      label: <Link to="/reports">{t("statistical-reports")}</Link>,
       icon: <BarChartOutlined />,
     },
   ],
   EVALUATION: [
     {
       key: "/evaluate",
-      label: <Link to="/evaluate">Chấm điểm sáng kiến</Link>,
+      label: <Link to="/evaluate">{t("evaluate-initiatives")}</Link>,
       icon: <CheckCircleOutlined />,
     },
   ],
   REVIEW: [
     {
       key: "/review",
-      label: <Link to="/review">Kiểm tra hồ sơ</Link>,
+      label: <Link to="/review">{t("check-records")}</Link>,
       icon: <AuditOutlined />,
     },
   ],
   USER_INITIATIVES: [
     {
       key: "/my-initiatives",
-      label: <Link to="/my-initiatives">Sáng kiến của tôi</Link>,
+      label: <Link to="/my-initiatives">{t("my-initiatives")}</Link>,
       icon: <FileSearchOutlined />,
     },
     {
       key: "/submit-initiative",
-      label: <Link to="/submit-initiative">Gửi sáng kiến</Link>,
+      label: <Link to="/submit-initiative">{t("submit-initiative")}</Link>,
       icon: <FileAddOutlined />,
     },
   ],

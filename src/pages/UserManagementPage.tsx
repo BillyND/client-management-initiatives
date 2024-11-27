@@ -1,15 +1,17 @@
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined, UserAddOutlined } from "@ant-design/icons";
 import { Button, Grid, Space, Tag, Tooltip } from "antd";
 import { useCallback, useState } from "react";
 import DataSourceListTable from "../components/ListTable";
-import { EditUserModal } from "../components/Users2/EditUserModal";
-import { ViewUserModal } from "../components/Users2/ViewUserModal";
+import { EditUserModal } from "../components/Users/EditUserModal";
+import { ViewUserModal } from "../components/Users/ViewUserModal";
 import { User } from "../services";
-import { UserRoleModal } from "../components/Users2/UserRoleModal";
+import { UserRoleModal } from "../components/Users/UserRoleModal";
+import { useTranslation } from "react-i18next";
 
 const { useBreakpoint } = Grid;
 
 const UserManagementPage: React.FC = () => {
+  const { t } = useTranslation();
   const screens = useBreakpoint();
   const [isRefetching, setIsRefetching] = useState({});
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(
@@ -58,15 +60,14 @@ const UserManagementPage: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: "Họ và tên",
+      title: t("Name"),
       dataIndex: "name",
       key: "name",
-      render: (text?: string) => <a>{text}</a>,
       ellipsis: screens.xs,
       sorter: true,
     },
     {
-      title: "Email",
+      title: t("email"),
       dataIndex: "email",
       key: "email",
       ellipsis: true,
@@ -74,37 +75,39 @@ const UserManagementPage: React.FC = () => {
       sorter: true,
     },
     {
-      title: "Số điện thoại",
+      title: t("phone-number"),
       dataIndex: "phone",
       key: "phone",
       responsive: ["lg"],
+      sorter: true,
     },
     {
-      title: "Phòng ban",
+      title: t("department"),
       dataIndex: "department",
       key: "department",
       responsive: ["lg"],
       sorter: true,
     },
     {
-      title: "Chức vụ",
+      title: t("position"),
       dataIndex: "position",
       key: "position",
       responsive: ["lg"],
+      sorter: true,
     },
     {
-      title: "Trạng thái",
+      title: t("status"),
       dataIndex: "isActive",
       key: "isActive",
       render: (isActive?: boolean) => (
         <Tag color={isActive ? "green" : "red"}>
-          {isActive ? "Đang hoạt động" : "Đã khóa"}
+          {isActive ? t("active") : t("locked")}
         </Tag>
       ),
       sorter: true,
     },
     {
-      title: "Vai trò",
+      title: t("roles"),
       dataIndex: "roles",
       key: "roles",
       render: (roles: string[]) => (
@@ -119,12 +122,12 @@ const UserManagementPage: React.FC = () => {
       responsive: ["xl"],
     },
     {
-      title: "Thao tác",
+      title: t("actions"),
       key: "action",
       width: screens.xs ? 100 : "auto",
       render: (_: any, record: User) => (
         <Space size="small">
-          <Tooltip title="Xem chi tiết">
+          <Tooltip title={t("view-details")}>
             <Button
               type="link"
               onClick={() => handleViewDetail(record.email)}
@@ -132,7 +135,7 @@ const UserManagementPage: React.FC = () => {
               style={{ color: "#1890ff" }}
             />
           </Tooltip>
-          <Tooltip title="Chỉnh sửa">
+          <Tooltip title={t("edit")}>
             <Button
               type="link"
               onClick={() => handleEdit(record.email)}
@@ -140,12 +143,12 @@ const UserManagementPage: React.FC = () => {
               style={{ color: "#52c41a" }}
             />
           </Tooltip>
-          <Tooltip title="Gán vai trò">
+          <Tooltip title={t("assign-role")}>
             <Button
               type="link"
               onClick={() => handleAssignRole(record.email)}
-              icon={<EditOutlined />}
-              style={{ color: "#52c41a" }}
+              icon={<UserAddOutlined />}
+              style={{ color: "#faad14" }}
             />
           </Tooltip>
         </Space>
@@ -156,19 +159,19 @@ const UserManagementPage: React.FC = () => {
   const filters = [
     {
       key: "isActive",
-      label: "Trạng thái",
+      label: t("status"),
       options: [
-        { label: "Đang hoạt động", value: true },
-        { label: "Đã khóa", value: false },
+        { label: t("active"), value: true },
+        { label: t("locked"), value: false },
       ],
     },
     {
       key: "department",
-      label: "Phòng ban",
+      label: t("department"),
       options: [
-        { label: "Phòng Kỹ thuật", value: "technical" },
-        { label: "Phòng Nhân sự", value: "hr" },
-        { label: "Phòng Kinh doanh", value: "sales" },
+        { label: t("technical-department"), value: "technical" },
+        { label: t("hr-department"), value: "hr" },
+        { label: t("sales-department"), value: "sales" },
       ],
     },
   ];
@@ -177,7 +180,7 @@ const UserManagementPage: React.FC = () => {
     <>
       <DataSourceListTable
         isRefetching={isRefetching}
-        title="Quản lý người dùng"
+        title={t("user-management")}
         dataSource="users"
         columns={columns}
         filters={filters}
@@ -185,7 +188,7 @@ const UserManagementPage: React.FC = () => {
         pagination={{
           showSizeChanger: !screens.xs,
           size: screens.xs ? "small" : "default",
-          showTotal: (total: number) => `Tổng số ${total} người dùng`,
+          showTotal: (total: number) => `${t("total")} ${total} ${t("users")}`,
         }}
       />
 
