@@ -2,7 +2,7 @@ import { message } from "antd";
 import type { TablePaginationConfig } from "antd/es/table";
 import { useCallback, useEffect, useState } from "react";
 import apiClient from "../utils/apiClient";
-import { ITEM_LIST_LIMITATION } from "../common/constants/limitations.constant";
+import { ITEM_LIST_LIMITATION } from "../constants/limitations.constant";
 
 export interface WithDataSourceProps {
   sort?: string[];

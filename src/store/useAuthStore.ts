@@ -12,19 +12,23 @@ interface AuthState {
   logout: () => void;
 }
 
+// Define cookie options
+const COOKIE_OPTIONS = {
+  secure: true,
+  sameSite: "strict" as const,
+  expires: 7, // 7 days
+};
+
 const cookieStorage = {
   getItem: (name: string) => {
     const value = Cookies.get(name);
     return value ? JSON.parse(value) : null;
   },
   setItem: (name: string, value: any) => {
-    Cookies.set(name, JSON.stringify(value), {
-      secure: true,
-      sameSite: "strict",
-    });
+    Cookies.set(name, JSON.stringify(value), COOKIE_OPTIONS);
   },
   removeItem: (name: string) => {
-    Cookies.remove(name);
+    Cookies.remove(name, COOKIE_OPTIONS);
   },
 };
 

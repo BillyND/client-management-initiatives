@@ -3,11 +3,7 @@ import apiClient from "../utils/apiClient";
 
 export const authService = {
   async login(email: string, password: string) {
-    const response = await apiClient.post(
-      "/auth/login",
-      { email, password },
-      { withCredentials: true }
-    );
+    const response = await apiClient.post("/auth/login", { email, password });
 
     useAuthStore.getState().setAuth(response.data.user, {
       refresh: response?.data?.refreshToken,
@@ -28,9 +24,7 @@ export const authService = {
   },
 
   async logout() {
-    await apiClient
-      .post("/auth/logout", {}, { withCredentials: true })
-      .catch(console.error);
+    await apiClient.post("/auth/logout", {}, { withCredentials: true });
     useAuthStore.getState().logout();
   },
 

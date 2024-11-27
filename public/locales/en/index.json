@@ -1,0 +1,15 @@
+{
+    "role-updated-successfully": "Role updated successfully!",
+    "unable-to-load-role-information": "Unable to load role information",
+    "unable-to-update-role-please-try-again": "Unable to update role. Please try again!",
+    "please-select-at-least-one-role": "Please select at least one role",
+    "assign-roles-to-user": "Assign roles to user",
+    "available-roles": "Available roles",
+    "assigned-roles": "Assigned roles",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "role": "role",
+    "roles": "roles",
+    "no-data": "No data",
+    "search": "Search"
+}

@@ -43,4 +43,7 @@ export const userService = {
       throw new Error("Failed to update profile" + error);
     }
   },
+
+  assignRoleToUser: async (userEmail: string, roleIds: string[]) =>
+    await apiClient.put(`/users/${userEmail}/roles`, { roleIds }),
 };

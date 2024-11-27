@@ -1,0 +1,15 @@
+{
+    "role-updated-successfully": "Cập nhật vai trò thành công!",
+    "unable-to-load-role-information": "Không thể tải thông tin vai trò",
+    "unable-to-update-role-please-try-again": "Không thể cập nhật vai trò. Vui lòng thử lại!",
+    "please-select-at-least-one-role": "Vui lòng chọn ít nhất một vai trò",
+    "assign-roles-to-user": "Gán vai trò cho người dùng",
+    "available-roles": "Vai trò có sẵn",
+    "assigned-roles": "Vai trò được chỉ định",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy bỏ",
+    "role": "vai trò",
+    "roles": "vai trò",
+    "no-data": "Không có dữ liệu",
+    "search": "Tìm kiếm"
+}

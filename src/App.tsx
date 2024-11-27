@@ -1,28 +1,26 @@
 import { ConfigProvider } from "antd";
-import viVN from "antd/lib/locale/vi_VN";
 import React, { useCallback, useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { LoadingScreen } from "./components/LoadingScreen";
+import { LoadingScreen } from "./components/LoadingScreen.tsx";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { ROLES } from "./constants/roles.constants.tsx";
 import { MainLayout } from "./layouts/MainLayout";
 import AuthPage from "./pages/AuthPage";
+import ChangePassword from "./pages/ChangePassword";
 import EvaluationPage from "./pages/EvaluationPage";
 import HomePage from "./pages/HomePage";
 import InitiativeListPage from "./pages/InitiativeListPage";
+import MyInitiativesPage from "./pages/MyInitiativesPage";
+import ProfilePage from "./pages/ProfilePage";
 import ReportsPage from "./pages/ReportsPage";
 import SubmitInitiativePage from "./pages/SubmitInitiativePage";
-import { authService } from "./services";
-import { useAuthStore } from "./store/useAuthStore";
-import MyInitiativesPage from "./pages/MyInitiativesPage";
-import ChangePassword from "./pages/ChangePassword";
-import ProfilePage from "./pages/ProfilePage";
 import UserManagementPage from "./pages/UserManagementPage";
+import { authService } from "./services/authService.ts";
+import { useAuthStore } from "./store/useAuthStore.ts";
 
 const App: React.FC = () => {
   return (
-    <ConfigProvider
-      locale={viVN}
-      theme={{ token: { colorPrimary: "#11b75c" } }}
-    >
+    <ConfigProvider theme={{ token: { colorPrimary: "#11b75c" } }}>
       <AuthWrapper>
         <MainLayout>
           <Routes>
@@ -38,7 +36,14 @@ const App: React.FC = () => {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="change-password" element={<ChangePassword />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="users" element={<UserManagementPage />} />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
+                  <UserManagementPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </MainLayout>
       </AuthWrapper>
@@ -47,46 +52,45 @@ const App: React.FC = () => {
 };
 
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { setAuth } = useAuthStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isAuthPage = pathname === "/auth";
 
-  // Handle authentication verification and navigation
-  const handleAuthVerification = useCallback(
-    async (user: any) => {
-      setAuth(user);
-
-      if (user) {
-        navigate(isAuthPage ? "/" : pathname);
-      } else {
-        navigate("/auth");
-      }
-    },
-    [setAuth, navigate, isAuthPage, pathname]
-  );
+  const [isLoading, setIsLoading] = useState(false);
+  const { setAuth, user, accessToken } = useAuthStore();
+  console.log("===>user", user, accessToken);
 
   // Verify authentication status
   const verifyAuth = useCallback(async () => {
     if (isLoading) return;
-
     setIsLoading(true);
+
     try {
       const user = await authService.verifyToken();
-      await handleAuthVerification(user);
+
+      // Redirect if authenticated
+      if (user && isAuthPage) {
+        navigate("/");
+      } else if (!user && !isAuthPage) {
+        navigate("/auth");
+      }
+
+      setAuth(user);
     } catch (error) {
-      console.log(error);
-      navigate("/auth");
+      console.error(error);
+
+      if (!isAuthPage) {
+        navigate("/auth");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, handleAuthVerification, navigate]);
+  }, [isLoading, isAuthPage, setAuth, navigate]);
 
   useEffect(() => {
     verifyAuth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthPage]);
+  }, []);
 
   if (isLoading) {
     return <LoadingScreen />;

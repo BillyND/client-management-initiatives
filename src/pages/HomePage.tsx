@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
-import { ROLES } from "../common/enums/roles.enum";
+import { ROLES } from "../constants/roles.constants.tsx";
 
 const HomePage: React.FC = () => {
   const user = useAuthStore(({ user }) => user);
